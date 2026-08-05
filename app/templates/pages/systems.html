@@ -1,0 +1,148 @@
+{% extends "layouts/base.html" %}
+{% block title %}Systems of Equations — Linear Algebra Solver{% endblock %}
+
+{% block content %}
+
+<div class="calc-header">
+  <div class="container">
+    <h1>Systems of Linear Equations (Ax = b)</h1>
+    <p>Enter the coefficient matrix A and constants b to solve the system.</p>
+  </div>
+</div>
+
+<div class="container mb-5">
+  <div class="row g-4">
+
+    <!-- Input -->
+    <div class="col-lg-7">
+      <div class="card">
+        <div class="card-body">
+
+          <div class="row g-2 mb-3">
+            <div class="col-auto">
+              <label class="form-label" for="sysN">Number of variables (n)</label>
+              <input type="number" id="sysN" class="form-control" value="2" min="1" max="6" style="width:80px" onchange="buildSystem()">
+            </div>
+            <div class="col-auto align-self-end">
+              <span class="text-muted small">(square system n×n)</span>
+            </div>
+          </div>
+
+          <div class="table-responsive mb-3">
+            <table class="system-table" id="systemTable">
+              <!-- built by JS -->
+            </table>
+          </div>
+
+          <button class="btn btn-primary" onclick="calcSystem()">Solve</button>
+          <button class="btn btn-outline-secondary ms-2" onclick="clearSystem()">Clear</button>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="col-lg-5">
+      <h5>Solution x</h5>
+      <div class="result-panel" id="sysResultPanel">
+        <span class="text-muted">Solution will appear here.</span>
+      </div>
+      <div id="sysStepsBox" class="steps-box mt-2" style="display:none"></div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function buildSystem() {
+  const n = parseInt(document.getElementById("sysN").value) || 2;
+  const table = document.getElementById("systemTable");
+  let html = "<tbody>";
+  for (let r = 0; r < n; r++) {
+    html += "<tr>";
+    for (let c = 0; c < n; c++) {
+      html += `<td><input type="number" id="sys_a_${r}_${c}" value="0"></td>`;
+      if (c < n - 1) {
+        html += `<td style="text-align:center; padding:0 4px; color:#6c757d; font-size:0.9rem">x<sub>${c+1}</sub> +</td>`;
+      } else {
+        html += `<td style="text-align:center; padding:0 4px; color:#6c757d; font-size:0.9rem">x<sub>${c+1}</sub></td>`;
+      }
+    }
+    html += `<td class="eq-sign">=</td>`;
+    html += `<td><input type="number" id="sys_b_${r}" value="0"></td>`;
+    html += "</tr>";
+  }
+  html += "</tbody>";
+  table.innerHTML = html;
+}
+
+function clearSystem() {
+  const n = parseInt(document.getElementById("sysN").value) || 2;
+  for (let r = 0; r < n; r++) {
+    for (let c = 0; c < n; c++) {
+      const el = document.getElementById(`sys_a_${r}_${c}`);
+      if (el) el.value = "0";
+    }
+    const bEl = document.getElementById(`sys_b_${r}`);
+    if (bEl) bEl.value = "0";
+  }
+  const panel = document.getElementById("sysResultPanel");
+  panel.className = "result-panel";
+  panel.innerHTML = '<span class="text-muted">Solution will appear here.</span>';
+  document.getElementById("sysStepsBox").style.display = "none";
+}
+
+async function calcSystem() {
+  const n = parseInt(document.getElementById("sysN").value) || 2;
+  const A = [], b = [];
+  for (let r = 0; r < n; r++) {
+    const row = [];
+    for (let c = 0; c < n; c++) {
+      row.push(parseFloat(document.getElementById(`sys_a_${r}_${c}`).value) || 0);
+    }
+    A.push(row);
+    b.push(parseFloat(document.getElementById(`sys_b_${r}`).value) || 0);
+  }
+
+  const res = await fetch("/api/systems", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({A, b})
+  });
+  const data = await res.json();
+  showSysResult(data, n);
+}
+
+function showSysResult(data, n) {
+  const panel = document.getElementById("sysResultPanel");
+  const stepsBox = document.getElementById("sysStepsBox");
+
+  if (data.error) {
+    panel.className = "result-panel error";
+    panel.textContent = "Error: " + data.error;
+    stepsBox.style.display = "none";
+    return;
+  }
+
+  panel.className = "result-panel success";
+  let html = "<ul class='mb-0'>";
+  data.result.forEach((v, i) => {
+    html += `<li><strong>x<sub>${i+1}</sub> = ${v}</strong></li>`;
+  });
+  html += "</ul>";
+  panel.innerHTML = html;
+
+  if (data.steps) {
+    stepsBox.textContent = data.steps;
+    stepsBox.style.display = "block";
+  } else {
+    stepsBox.style.display = "none";
+  }
+}
+
+buildSystem();
+</script>
+{% endblock %}

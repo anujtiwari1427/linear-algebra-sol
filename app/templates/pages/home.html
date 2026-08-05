@@ -1,0 +1,106 @@
+{% extends "layouts/base.html" %}
+{% block title %}Linear Algebra Solver — Home{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <h1>Linear Algebra Solver</h1>
+    <p>Free online calculators for matrices, vectors, systems of equations, and eigenvalues.</p>
+    <a href="/calculators/matrix/" class="btn btn-primary me-2">Get Started</a>
+    <a href="#tools" class="btn btn-outline-light">See Tools</a>
+  </div>
+</section>
+
+<!-- Tools -->
+<section class="container my-5" id="tools">
+  <h2 class="mb-4">Available Calculators</h2>
+  <div class="row g-4">
+
+    <div class="col-sm-6 col-md-4">
+      <a href="/calculators/matrix/" class="tool-card">
+        <div class="icon">🔢</div>
+        <h3>Matrix Calculator</h3>
+        <p>Add, subtract, multiply, transpose, inverse, rank, trace.</p>
+      </a>
+    </div>
+
+    <div class="col-sm-6 col-md-4">
+      <a href="/calculators/determinants/" class="tool-card">
+        <div class="icon">|A|</div>
+        <h3>Determinants</h3>
+        <p>Step-by-step cofactor expansion, minors &amp; cofactors table.</p>
+      </a>
+    </div>
+
+    <div class="col-sm-6 col-md-4">
+      <a href="/calculators/vectors/" class="tool-card">
+        <div class="icon">➡️</div>
+        <h3>Vector Calculator</h3>
+        <p>Dot product, cross product, magnitude, angle, projection, normalize.</p>
+      </a>
+    </div>
+
+    <div class="col-sm-6 col-md-4">
+      <a href="/calculators/systems/" class="tool-card">
+        <div class="icon">🔗</div>
+        <h3>Systems of Equations</h3>
+        <p>Solve Ax = b with step-by-step explanation.</p>
+      </a>
+    </div>
+
+    <div class="col-sm-6 col-md-4">
+      <a href="/calculators/eigen/" class="tool-card">
+        <div class="icon">λ</div>
+        <h3>Eigenvalues</h3>
+        <p>Compute eigenvalues and eigenvectors of any square matrix.</p>
+      </a>
+    </div>
+
+    <div class="col-sm-6 col-md-4">
+      <a href="/calculators/transform/" class="tool-card">
+        <div class="icon">↺</div>
+        <h3>Transformations</h3>
+        <p>Rotation, scaling, shear, reflection, projection — 2D &amp; 3D.</p>
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- Quick reference -->
+<section class="container mb-5">
+  <div class="section-divider"></div>
+  <h2 class="mb-3">Quick Reference</h2>
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Matrix Operations</h5>
+          <ul class="mb-0">
+            <li><strong>Addition / Subtraction</strong> — same dimensions required</li>
+            <li><strong>Multiplication</strong> — A(m×k) × B(k×n) = C(m×n)</li>
+            <li><strong>Inverse</strong> — exists only if det(A) ≠ 0</li>
+            <li><strong>Transpose</strong> — flip rows and columns</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Vector Formulas</h5>
+          <ul class="mb-0">
+            <li><strong>Magnitude</strong> — |v| = √(x² + y² + z²)</li>
+            <li><strong>Dot product</strong> — a · b = |a||b|cos(θ)</li>
+            <li><strong>Cross product</strong> — 3D vectors only, result is ⊥ both</li>
+            <li><strong>Projection</strong> — proj_b(a) = (a·b / |b|²) b</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

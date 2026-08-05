@@ -1,0 +1,200 @@
+/* ===============================
+   Global styles — simple & clean
+   =============================== */
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+h1, h2, h3 {
+  font-weight: 600;
+}
+
+/* ---- Hero section (home page) ---- */
+.hero {
+  background-color: #343a40;
+  color: white;
+  padding: 60px 0;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  color: #adb5bd;
+  margin-bottom: 24px;
+}
+
+/* ---- Tool cards (home page) ---- */
+.tool-card {
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 24px;
+  background: white;
+  transition: box-shadow 0.2s;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.tool-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  border-color: #0d6efd;
+  color: inherit;
+}
+
+.tool-card .icon {
+  font-size: 2rem;
+  margin-bottom: 12px;
+}
+
+.tool-card h3 {
+  font-size: 1.15rem;
+  margin-bottom: 6px;
+}
+
+.tool-card p {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin: 0;
+}
+
+/* ---- Calculator pages ---- */
+.calc-header {
+  background-color: #343a40;
+  color: white;
+  padding: 30px 0 20px;
+  margin-bottom: 30px;
+}
+
+.calc-header h1 {
+  font-size: 1.7rem;
+  margin-bottom: 4px;
+}
+
+.calc-header p {
+  color: #adb5bd;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* ---- Matrix grid inputs ---- */
+.matrix-grid {
+  display: inline-grid;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.matrix-grid input {
+  width: 60px;
+  height: 40px;
+  text-align: center;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.95rem;
+}
+
+.matrix-grid input:focus {
+  outline: none;
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 2px rgba(13,110,253,0.2);
+}
+
+/* ---- Result panel ---- */
+.result-panel {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 20px;
+  margin-top: 20px;
+  min-height: 80px;
+}
+
+.result-panel.error {
+  border-color: #dc3545;
+  background: #fff5f5;
+  color: #dc3545;
+}
+
+.result-panel.success {
+  border-color: #198754;
+}
+
+.result-matrix {
+  font-family: monospace;
+  font-size: 1rem;
+}
+
+.result-matrix tr td {
+  padding: 4px 10px;
+  border: 1px solid #dee2e6;
+  text-align: center;
+  min-width: 60px;
+}
+
+/* ---- Steps / explanation ---- */
+.steps-box {
+  background: #f1f3f5;
+  border-left: 4px solid #0d6efd;
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  color: #495057;
+  margin-top: 12px;
+  border-radius: 0 4px 4px 0;
+  white-space: pre-line;
+}
+
+/* ---- Vector input ---- */
+.vector-input {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.vector-input input {
+  width: 70px;
+  height: 38px;
+  text-align: center;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.95rem;
+}
+
+/* ---- System Ax=b table inputs ---- */
+.system-table td input {
+  width: 60px;
+  height: 36px;
+  text-align: center;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.system-table td {
+  padding: 4px 6px;
+  vertical-align: middle;
+}
+
+.system-table .eq-sign {
+  font-weight: bold;
+  padding: 0 8px;
+}
+
+/* ---- Misc ---- */
+label.form-label {
+  font-weight: 500;
+}
+
+.section-divider {
+  border-top: 1px solid #dee2e6;
+  margin: 24px 0;
+}

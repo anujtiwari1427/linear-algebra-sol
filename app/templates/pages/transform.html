@@ -1,0 +1,328 @@
+{% extends "layouts/base.html" %}
+{% block title %}Linear Transformations — Linear Algebra Solver{% endblock %}
+
+{% block content %}
+
+<div class="calc-header">
+  <div class="container">
+    <h1>Linear Transformation Calculator</h1>
+    <p>Build a transformation matrix and optionally apply it to a vector.</p>
+  </div>
+</div>
+
+<div class="container mb-5">
+  <div class="row g-4">
+
+    <!-- LEFT: Controls -->
+    <div class="col-lg-5">
+      <div class="card">
+        <div class="card-body">
+
+          <div class="mb-3">
+            <label class="form-label" for="tType">Transformation Type</label>
+            <select class="form-select" id="tType" onchange="updateTransformUI()">
+              <optgroup label="2D Transforms">
+                <option value="rotation_2d">2D Rotation</option>
+                <option value="scale">Scaling</option>
+                <option value="shear_x">Horizontal Shear</option>
+                <option value="shear_y">Vertical Shear</option>
+                <option value="reflect_x">Reflect over X-axis</option>
+                <option value="reflect_y">Reflect over Y-axis</option>
+                <option value="reflect_origin">Reflect through Origin</option>
+                <option value="project_x">Project onto X-axis</option>
+                <option value="project_y">Project onto Y-axis</option>
+              </optgroup>
+              <optgroup label="3D Transforms">
+                <option value="rotation_3d_x">3D Rotation — X axis</option>
+                <option value="rotation_3d_y">3D Rotation — Y axis</option>
+                <option value="rotation_3d_z">3D Rotation — Z axis</option>
+              </optgroup>
+              <optgroup label="Custom">
+                <option value="custom">Custom Matrix</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <!-- Angle param -->
+          <div id="angleParam" class="mb-3">
+            <label class="form-label" for="angleDeg">Angle (degrees)</label>
+            <input type="number" id="angleDeg" class="form-control" value="45" style="width:120px">
+          </div>
+
+          <!-- Scale params -->
+          <div id="scaleParam" class="mb-3" style="display:none">
+            <div class="row g-2">
+              <div class="col-auto">
+                <label class="form-label" for="scaleX">sx</label>
+                <input type="number" id="scaleX" class="form-control" value="2" style="width:80px" step="0.1">
+              </div>
+              <div class="col-auto">
+                <label class="form-label" for="scaleY">sy</label>
+                <input type="number" id="scaleY" class="form-control" value="2" style="width:80px" step="0.1">
+              </div>
+              <div class="col-auto" id="scaleZWrapper" style="display:none">
+                <label class="form-label" for="scaleZ">sz</label>
+                <input type="number" id="scaleZ" class="form-control" value="1" style="width:80px" step="0.1">
+              </div>
+            </div>
+          </div>
+
+          <!-- Shear param -->
+          <div id="shearParam" class="mb-3" style="display:none">
+            <label class="form-label" for="shearK">Shear factor (k)</label>
+            <input type="number" id="shearK" class="form-control" value="1" style="width:120px" step="0.1">
+          </div>
+
+          <!-- Custom matrix -->
+          <div id="customParam" class="mb-3" style="display:none">
+            <div class="row g-2 mb-2">
+              <div class="col-auto">
+                <label class="form-label" for="customRows">Rows</label>
+                <input type="number" id="customRows" class="form-control" value="2" min="1" max="5" style="width:70px" onchange="buildCustomGrid()">
+              </div>
+              <div class="col-auto">
+                <label class="form-label" for="customCols">Cols</label>
+                <input type="number" id="customCols" class="form-control" value="2" min="1" max="5" style="width:70px" onchange="buildCustomGrid()">
+              </div>
+            </div>
+            <label class="form-label">Custom Matrix T</label>
+            <div id="customGrid" class="matrix-grid mb-2"></div>
+          </div>
+
+          <!-- Vector input -->
+          <div class="section-divider"></div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="applyVector" onchange="updateVectorSection()">
+            <label class="form-check-label" for="applyVector">Apply transform to a vector</label>
+          </div>
+
+          <div id="vectorSection" style="display:none" class="mb-3">
+            <label class="form-label">Input vector</label>
+            <div class="vector-input" id="transformVecInputs"></div>
+          </div>
+
+          <button class="btn btn-primary" onclick="calcTransform()">Compute</button>
+          <button class="btn btn-outline-secondary ms-2" onclick="clearTransform()">Clear</button>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Results -->
+    <div class="col-lg-7">
+      <h5>Transformation Matrix</h5>
+      <div class="result-panel" id="tResultPanel">
+        <span class="text-muted">Result will appear here.</span>
+      </div>
+      <div id="tStepsBox" class="steps-box mt-2" style="display:none"></div>
+
+      <!-- Vector result -->
+      <div id="tVectorResult" style="display:none" class="mt-4">
+        <div class="section-divider"></div>
+        <h6>Applied to Vector</h6>
+        <div class="row g-3">
+          <div class="col-auto">
+            <strong>Input:</strong>
+            <div id="tvIn" class="mt-1" style="font-family:monospace; font-size:1rem;"></div>
+          </div>
+          <div class="col-auto align-self-center" style="font-size:1.4rem; color:#6c757d;">→</div>
+          <div class="col-auto">
+            <strong>Output:</strong>
+            <div id="tvOut" class="mt-1" style="font-family:monospace; font-size:1rem; color:#198754;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reference table -->
+      <div class="card mt-4">
+        <div class="card-body">
+          <h6 class="card-title">Common 2D Transforms Reference</h6>
+          <div class="table-responsive">
+            <table class="table table-sm table-bordered small mb-0">
+              <thead class="table-light">
+                <tr><th>Transform</th><th>Matrix</th><th>Effect</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Rotation θ</td><td>[cosθ, −sinθ; sinθ, cosθ]</td><td>Rotate CCW by θ</td></tr>
+                <tr><td>Scale</td><td>[sx, 0; 0, sy]</td><td>Stretch/compress</td></tr>
+                <tr><td>Shear X</td><td>[1, k; 0, 1]</td><td>Slant horizontally</td></tr>
+                <tr><td>Reflect X</td><td>[1, 0; 0, −1]</td><td>Flip over x-axis</td></tr>
+                <tr><td>Reflect Y</td><td>[−1, 0; 0, 1]</td><td>Flip over y-axis</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const needs3D = ["rotation_3d_x","rotation_3d_y","rotation_3d_z"];
+const needsAngle = ["rotation_2d","rotation_3d_x","rotation_3d_y","rotation_3d_z"];
+const needsScale = ["scale"];
+const needsShear = ["shear_x","shear_y"];
+const needsCustom = ["custom"];
+
+function updateTransformUI() {
+  const t = document.getElementById("tType").value;
+  document.getElementById("angleParam").style.display = needsAngle.includes(t) ? "block" : "none";
+  document.getElementById("scaleParam").style.display = needsScale.includes(t) ? "block" : "none";
+  document.getElementById("shearParam").style.display = needsShear.includes(t) ? "block" : "none";
+  document.getElementById("customParam").style.display = needsCustom.includes(t) ? "block" : "none";
+  document.getElementById("scaleZWrapper").style.display = needs3D.includes(t) ? "inline-block" : "none";
+
+  // Rebuild vector inputs with correct length
+  if (document.getElementById("applyVector").checked) {
+    buildTransformVec(needs3D.includes(t) ? 3 : 2);
+  }
+}
+
+function updateVectorSection() {
+  const checked = document.getElementById("applyVector").checked;
+  document.getElementById("vectorSection").style.display = checked ? "block" : "none";
+  if (checked) {
+    const t = document.getElementById("tType").value;
+    buildTransformVec(needs3D.includes(t) ? 3 : 2);
+  }
+}
+
+function buildTransformVec(n) {
+  const div = document.getElementById("transformVecInputs");
+  div.innerHTML = "";
+  for (let i = 0; i < n; i++) {
+    const inp = document.createElement("input");
+    inp.type = "number";
+    inp.value = i === 0 ? "1" : "0";
+    inp.id = `tv_${i}`;
+    div.appendChild(inp);
+  }
+}
+
+function buildCustomGrid() {
+  const rows = parseInt(document.getElementById("customRows").value) || 2;
+  const cols = parseInt(document.getElementById("customCols").value) || 2;
+  const div = document.getElementById("customGrid");
+  div.style.gridTemplateColumns = `repeat(${cols}, 60px)`;
+  div.innerHTML = "";
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const inp = document.createElement("input");
+      inp.type = "number";
+      inp.value = r === c ? "1" : "0";
+      inp.id = `cg_${r}_${c}`;
+      div.appendChild(inp);
+    }
+  }
+}
+
+function clearTransform() {
+  const panel = document.getElementById("tResultPanel");
+  panel.className = "result-panel";
+  panel.innerHTML = '<span class="text-muted">Result will appear here.</span>';
+  document.getElementById("tStepsBox").style.display = "none";
+  document.getElementById("tVectorResult").style.display = "none";
+}
+
+function getParams() {
+  const t = document.getElementById("tType").value;
+  const p = {};
+  if (needsAngle.includes(t)) {
+    p.angle_deg = parseFloat(document.getElementById("angleDeg").value) || 0;
+  }
+  if (needsScale.includes(t)) {
+    p.sx = parseFloat(document.getElementById("scaleX").value) || 1;
+    p.sy = parseFloat(document.getElementById("scaleY").value) || 1;
+    if (needs3D.includes(t)) p.sz = parseFloat(document.getElementById("scaleZ").value) || 1;
+  }
+  if (needsShear.includes(t)) {
+    p.shear = parseFloat(document.getElementById("shearK").value) || 0;
+  }
+  if (needsCustom.includes(t)) {
+    const rows = parseInt(document.getElementById("customRows").value) || 2;
+    const cols = parseInt(document.getElementById("customCols").value) || 2;
+    const m = [];
+    for (let r = 0; r < rows; r++) {
+      const row = [];
+      for (let c = 0; c < cols; c++) {
+        row.push(parseFloat(document.getElementById(`cg_${r}_${c}`)?.value) || 0);
+      }
+      m.push(row);
+    }
+    p.matrix = m;
+  }
+  return p;
+}
+
+async function calcTransform() {
+  const t = document.getElementById("tType").value;
+  const params = getParams();
+  const payload = { transform_type: t, params };
+
+  if (document.getElementById("applyVector").checked) {
+    const inputs = document.querySelectorAll("#transformVecInputs input");
+    payload.vector = Array.from(inputs).map(el => parseFloat(el.value) || 0);
+  }
+
+  const res = await fetch("/api/transform", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json();
+  showTransformResult(data);
+}
+
+function showTransformResult(data) {
+  const panel = document.getElementById("tResultPanel");
+  const stepsBox = document.getElementById("tStepsBox");
+  const vecResult = document.getElementById("tVectorResult");
+
+  if (data.error) {
+    panel.className = "result-panel error";
+    panel.textContent = "Error: " + data.error;
+    stepsBox.style.display = "none";
+    vecResult.style.display = "none";
+    return;
+  }
+
+  panel.className = "result-panel success";
+
+  // Show matrix
+  let html = '<table class="result-matrix"><tbody>';
+  data.transform_matrix.forEach(row => {
+    html += "<tr>" + row.map(v => {
+      const s = typeof v === "number" ? +v.toFixed(4) : v;
+      return `<td>${s}</td>`;
+    }).join("") + "</tr>";
+  });
+  html += "</tbody></table>";
+  panel.innerHTML = html;
+
+  if (data.steps) {
+    stepsBox.textContent = data.steps;
+    stepsBox.style.display = "block";
+  } else {
+    stepsBox.style.display = "none";
+  }
+
+  // Vector result
+  if (data.input_vector !== undefined) {
+    document.getElementById("tvIn").textContent = `[ ${data.input_vector.join(", ")} ]`;
+    document.getElementById("tvOut").textContent = `[ ${data.output_vector.map(v => +v.toFixed(4)).join(", ")} ]`;
+    vecResult.style.display = "block";
+  } else {
+    vecResult.style.display = "none";
+  }
+}
+
+// Init
+updateTransformUI();
+buildCustomGrid();
+</script>
+{% endblock %}

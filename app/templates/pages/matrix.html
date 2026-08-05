@@ -1,0 +1,211 @@
+{% extends "layouts/base.html" %}
+{% block title %}Matrix Calculator — Linear Algebra Solver{% endblock %}
+
+{% block content %}
+
+<div class="calc-header">
+  <div class="container">
+    <h1>Matrix Calculator</h1>
+    <p>Enter matrix values and choose an operation to compute.</p>
+  </div>
+</div>
+
+<div class="container mb-5">
+  <div class="row g-4">
+
+    <!-- LEFT: Input panel -->
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-body">
+
+          <!-- Operation -->
+          <div class="mb-3">
+            <label class="form-label" for="operation">Operation</label>
+            <select class="form-select" id="operation" onchange="updateUI()">
+              <optgroup label="Single Matrix (A only)">
+                <option value="transpose">Transpose (Aᵀ)</option>
+                <option value="inverse">Inverse (A⁻¹)</option>
+                <option value="determinant">Determinant det(A)</option>
+                <option value="rank">Rank</option>
+                <option value="trace">Trace</option>
+              </optgroup>
+              <optgroup label="Two Matrices (A and B)">
+                <option value="add">Add (A + B)</option>
+                <option value="subtract">Subtract (A − B)</option>
+                <option value="multiply">Multiply (A × B)</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <!-- Size controls -->
+          <div class="row g-2 mb-3">
+            <div class="col-auto">
+              <label class="form-label" for="rowsA">A rows</label>
+              <input type="number" id="rowsA" class="form-control" value="2" min="1" max="6" style="width:70px" onchange="buildGrids()">
+            </div>
+            <div class="col-auto">
+              <label class="form-label" for="colsA">A cols</label>
+              <input type="number" id="colsA" class="form-control" value="2" min="1" max="6" style="width:70px" onchange="buildGrids()">
+            </div>
+            <div class="col-auto" id="sizeBWrapper" style="display:none">
+              <label class="form-label" for="rowsB">B rows</label>
+              <input type="number" id="rowsB" class="form-control" value="2" min="1" max="6" style="width:70px" onchange="buildGrids()">
+            </div>
+            <div class="col-auto" id="colsBWrapper" style="display:none">
+              <label class="form-label" for="colsB">B cols</label>
+              <input type="number" id="colsB" class="form-control" value="2" min="1" max="6" style="width:70px" onchange="buildGrids()">
+            </div>
+          </div>
+
+          <!-- Matrix A -->
+          <label class="form-label">Matrix A</label>
+          <div id="gridA" class="matrix-grid mb-3"></div>
+
+          <!-- Matrix B (hidden for single ops) -->
+          <div id="matrixBSection" style="display:none">
+            <label class="form-label">Matrix B</label>
+            <div id="gridB" class="matrix-grid mb-3"></div>
+          </div>
+
+          <button class="btn btn-primary" onclick="calculate()">Calculate</button>
+          <button class="btn btn-outline-secondary ms-2" onclick="clearAll()">Clear</button>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Result panel -->
+    <div class="col-lg-6">
+      <h5>Result</h5>
+      <div class="result-panel" id="resultPanel">
+        <span class="text-muted">Result will appear here after you click Calculate.</span>
+      </div>
+      <div id="stepsBox" class="steps-box mt-2" style="display:none"></div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const singleOps = ["transpose","inverse","determinant","rank","trace"];
+
+function updateUI() {
+  const op = document.getElementById("operation").value;
+  const isSingle = singleOps.includes(op);
+  document.getElementById("matrixBSection").style.display = isSingle ? "none" : "block";
+  document.getElementById("sizeBWrapper").style.display = isSingle ? "none" : "inline-block";
+  document.getElementById("colsBWrapper").style.display = isSingle ? "none" : "inline-block";
+}
+
+function buildGrids() {
+  const rA = parseInt(document.getElementById("rowsA").value) || 2;
+  const cA = parseInt(document.getElementById("colsA").value) || 2;
+  const rB = parseInt(document.getElementById("rowsB").value) || 2;
+  const cB = parseInt(document.getElementById("colsB").value) || 2;
+  buildGrid("gridA", rA, cA, "a");
+  buildGrid("gridB", rB, cB, "b");
+}
+
+function buildGrid(divId, rows, cols, prefix) {
+  const div = document.getElementById(divId);
+  div.style.gridTemplateColumns = `repeat(${cols}, 60px)`;
+  div.innerHTML = "";
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const inp = document.createElement("input");
+      inp.type = "number";
+      inp.value = "0";
+      inp.id = `${prefix}_${r}_${c}`;
+      div.appendChild(inp);
+    }
+  }
+}
+
+function readMatrix(rows, cols, prefix) {
+  const m = [];
+  for (let r = 0; r < rows; r++) {
+    const row = [];
+    for (let c = 0; c < cols; c++) {
+      row.push(parseFloat(document.getElementById(`${prefix}_${r}_${c}`).value) || 0);
+    }
+    m.push(row);
+  }
+  return m;
+}
+
+function clearAll() {
+  document.querySelectorAll("input[type=number][id^='a_'], input[type=number][id^='b_']")
+    .forEach(el => el.value = "0");
+  const panel = document.getElementById("resultPanel");
+  panel.className = "result-panel";
+  panel.innerHTML = '<span class="text-muted">Result will appear here after you click Calculate.</span>';
+  document.getElementById("stepsBox").style.display = "none";
+}
+
+async function calculate() {
+  const op = document.getElementById("operation").value;
+  const rA = parseInt(document.getElementById("rowsA").value) || 2;
+  const cA = parseInt(document.getElementById("colsA").value) || 2;
+  const matA = readMatrix(rA, cA, "a");
+
+  let payload = { operation: op, matrix_a: matA };
+
+  if (!singleOps.includes(op)) {
+    const rB = parseInt(document.getElementById("rowsB").value) || 2;
+    const cB = parseInt(document.getElementById("colsB").value) || 2;
+    payload.matrix_b = readMatrix(rB, cB, "b");
+  }
+
+  const res = await fetch("/api/matrix", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json();
+  showResult(data);
+}
+
+function showResult(data) {
+  const panel = document.getElementById("resultPanel");
+  const stepsBox = document.getElementById("stepsBox");
+
+  if (data.error) {
+    panel.className = "result-panel error";
+    panel.textContent = "Error: " + data.error;
+    stepsBox.style.display = "none";
+    return;
+  }
+
+  panel.className = "result-panel success";
+
+  // Single scalar
+  if (Array.isArray(data.result) && data.result.length === 1 && Array.isArray(data.result[0]) && data.result[0].length === 1) {
+    panel.innerHTML = `<strong>${data.result[0][0]}</strong>`;
+  } else if (Array.isArray(data.result) && Array.isArray(data.result[0])) {
+    // Matrix result
+    let html = '<table class="result-matrix"><tbody>';
+    data.result.forEach(row => {
+      html += "<tr>" + row.map(v => `<td>${typeof v === 'number' ? v.toFixed(4).replace(/\.?0+$/, '') : v}</td>`).join("") + "</tr>";
+    });
+    html += "</tbody></table>";
+    panel.innerHTML = html;
+  } else {
+    panel.innerHTML = `<strong>${JSON.stringify(data.result)}</strong>`;
+  }
+
+  if (data.steps) {
+    stepsBox.textContent = data.steps;
+    stepsBox.style.display = "block";
+  } else {
+    stepsBox.style.display = "none";
+  }
+}
+
+// Init
+updateUI();
+buildGrids();
+</script>
+{% endblock %}

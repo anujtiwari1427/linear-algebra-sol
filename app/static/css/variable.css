@@ -1,0 +1,24 @@
+:root{
+
+--primary:#2563EB;
+--secondary:#1E293B;
+--background:#F8FAFC;
+--white:#FFFFFF;
+--success:#10B981;
+--warning:#F59E0B;
+--shadow:0 10px 30px rgba(0,0,0,.08);
+
+}
+
+body{
+
+font-family:'Inter',sans-serif;
+background:var(--background);
+
+}
+
+h1,h2,h3,h4,h5{
+
+font-family:'Poppins',sans-serif;
+
+}

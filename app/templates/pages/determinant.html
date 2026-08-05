@@ -1,0 +1,217 @@
+{% extends "layouts/base.html" %}
+{% block title %}Determinant Calculator — Linear Algebra Solver{% endblock %}
+
+{% block content %}
+
+<div class="calc-header">
+  <div class="container">
+    <h1>Determinant Calculator</h1>
+    <p>Step-by-step cofactor expansion with minors and cofactors table.</p>
+  </div>
+</div>
+
+<div class="container mb-5">
+  <div class="row g-4">
+
+    <!-- Input -->
+    <div class="col-lg-5">
+      <div class="card">
+        <div class="card-body">
+
+          <div class="mb-3">
+            <label class="form-label" for="detN">Matrix size (n×n)</label>
+            <input type="number" id="detN" class="form-control" value="2"
+                   min="1" max="6" style="width:80px" onchange="buildDetGrid()">
+          </div>
+
+          <label class="form-label">Matrix A</label>
+          <div id="detGrid" class="matrix-grid mb-3"></div>
+
+          <!-- Quick fill buttons -->
+          <div class="mb-3">
+            <span class="text-muted small me-2">Quick fill:</span>
+            <button class="btn btn-sm btn-outline-secondary me-1" onclick="fillIdentity()">Identity</button>
+            <button class="btn btn-sm btn-outline-secondary me-1" onclick="fillRandom()">Random</button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="fillZero()">Zeros</button>
+          </div>
+
+          <button class="btn btn-primary" onclick="calcDet()">Calculate</button>
+          <button class="btn btn-outline-secondary ms-2" onclick="clearDet()">Clear</button>
+
+        </div>
+      </div>
+
+      <!-- What is a determinant? -->
+      <div class="card mt-3">
+        <div class="card-body">
+          <h6 class="card-title">What is a Determinant?</h6>
+          <ul class="small text-muted mb-0">
+            <li>det(A) ≠ 0 → matrix is <strong>invertible</strong></li>
+            <li>det(A) = 0 → matrix is <strong>singular</strong> (no inverse)</li>
+            <li>|det(A)| = scale factor of the linear map</li>
+            <li>det(AB) = det(A) × det(B)</li>
+            <li>det(Aᵀ) = det(A)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="col-lg-7">
+      <h5>Result</h5>
+      <div class="result-panel" id="detResultPanel">
+        <span class="text-muted">Result will appear here after clicking Calculate.</span>
+      </div>
+      <div id="detStepsBox" class="steps-box mt-2" style="display:none"></div>
+
+      <!-- Minors/Cofactors table -->
+      <div id="detTablesSection" style="display:none" class="mt-4">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <h6>Minors Matrix (M)</h6>
+            <div id="minorsTable"></div>
+          </div>
+          <div class="col-md-6">
+            <h6>Cofactors Matrix (C)</h6>
+            <div id="cofactorsTable"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+let currentN = 2;
+
+function buildDetGrid() {
+  currentN = parseInt(document.getElementById("detN").value) || 2;
+  const div = document.getElementById("detGrid");
+  div.style.gridTemplateColumns = `repeat(${currentN}, 60px)`;
+  div.innerHTML = "";
+  for (let r = 0; r < currentN; r++) {
+    for (let c = 0; c < currentN; c++) {
+      const inp = document.createElement("input");
+      inp.type = "number";
+      inp.value = r === c ? "1" : "0";
+      inp.id = `det_${r}_${c}`;
+      div.appendChild(inp);
+    }
+  }
+}
+
+function readMatrix() {
+  const n = currentN;
+  const m = [];
+  for (let r = 0; r < n; r++) {
+    const row = [];
+    for (let c = 0; c < n; c++) {
+      row.push(parseFloat(document.getElementById(`det_${r}_${c}`).value) || 0);
+    }
+    m.push(row);
+  }
+  return m;
+}
+
+function fillIdentity() {
+  for (let r = 0; r < currentN; r++)
+    for (let c = 0; c < currentN; c++) {
+      const el = document.getElementById(`det_${r}_${c}`);
+      if (el) el.value = r === c ? "1" : "0";
+    }
+}
+
+function fillZero() {
+  for (let r = 0; r < currentN; r++)
+    for (let c = 0; c < currentN; c++) {
+      const el = document.getElementById(`det_${r}_${c}`);
+      if (el) el.value = "0";
+    }
+}
+
+function fillRandom() {
+  for (let r = 0; r < currentN; r++)
+    for (let c = 0; c < currentN; c++) {
+      const el = document.getElementById(`det_${r}_${c}`);
+      if (el) el.value = Math.floor(Math.random() * 9) - 4;
+    }
+}
+
+function clearDet() {
+  fillIdentity();
+  const panel = document.getElementById("detResultPanel");
+  panel.className = "result-panel";
+  panel.innerHTML = '<span class="text-muted">Result will appear here after clicking Calculate.</span>';
+  document.getElementById("detStepsBox").style.display = "none";
+  document.getElementById("detTablesSection").style.display = "none";
+}
+
+async function calcDet() {
+  const matrix = readMatrix();
+  const res = await fetch("/api/determinants", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({matrix})
+  });
+  const data = await res.json();
+  showDetResult(data);
+}
+
+function showDetResult(data) {
+  const panel = document.getElementById("detResultPanel");
+  const stepsBox = document.getElementById("detStepsBox");
+  const tablesSection = document.getElementById("detTablesSection");
+
+  if (data.error) {
+    panel.className = "result-panel error";
+    panel.textContent = "Error: " + data.error;
+    stepsBox.style.display = "none";
+    tablesSection.style.display = "none";
+    return;
+  }
+
+  panel.className = "result-panel success";
+
+  const singularBadge = data.singular
+    ? '<span class="badge bg-danger ms-2">Singular (no inverse)</span>'
+    : '<span class="badge bg-success ms-2">Non-singular (invertible)</span>';
+
+  panel.innerHTML = `
+    <div style="font-size:1.3rem; font-weight:600;">
+      det(A) = ${data.det} ${singularBadge}
+    </div>
+  `;
+
+  if (data.steps) {
+    stepsBox.textContent = data.steps;
+    stepsBox.style.display = "block";
+  } else {
+    stepsBox.style.display = "none";
+  }
+
+  // Minors and cofactors tables
+  if (data.minors && data.minors.length > 0) {
+    document.getElementById("minorsTable").innerHTML = buildTable(data.minors);
+    document.getElementById("cofactorsTable").innerHTML = buildTable(data.cofactors);
+    tablesSection.style.display = "block";
+  } else {
+    tablesSection.style.display = "none";
+  }
+}
+
+function buildTable(matrix) {
+  let html = '<table class="result-matrix"><tbody>';
+  matrix.forEach(row => {
+    html += "<tr>" + row.map(v => `<td>${v}</td>`).join("") + "</tr>";
+  });
+  return html + "</tbody></table>";
+}
+
+// Init
+buildDetGrid();
+</script>
+{% endblock %}
