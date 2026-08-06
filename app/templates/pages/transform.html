@@ -110,7 +110,10 @@
 
     <!-- RIGHT: Results -->
     <div class="col-lg-7">
-      <h5>Transformation Matrix</h5>
+      <div class="result-header">
+        <h5 class="mb-0">Transformation Matrix</h5>
+        <button id="exportTransformTxtBtn" class="btn btn-outline-success btn-sm export-btn" style="display:none" onclick="exportTransformTxt()">📥 Export as TXT</button>
+      </div>
       <div class="result-panel" id="tResultPanel">
         <span class="text-muted">Result will appear here.</span>
       </div>
@@ -221,12 +224,16 @@ function buildCustomGrid() {
   }
 }
 
+let lastTransformCalc = null;
+
 function clearTransform() {
   const panel = document.getElementById("tResultPanel");
   panel.className = "result-panel";
   panel.innerHTML = '<span class="text-muted">Result will appear here.</span>';
   document.getElementById("tStepsBox").style.display = "none";
   document.getElementById("tVectorResult").style.display = "none";
+  document.getElementById("exportTransformTxtBtn").style.display = "none";
+  lastTransformCalc = null;
 }
 
 function getParams() {
@@ -275,6 +282,7 @@ async function calcTransform() {
     body: JSON.stringify(payload)
   });
   const data = await res.json();
+  lastTransformCalc = { t, payload, data };
   showTransformResult(data);
 }
 
@@ -282,16 +290,19 @@ function showTransformResult(data) {
   const panel = document.getElementById("tResultPanel");
   const stepsBox = document.getElementById("tStepsBox");
   const vecResult = document.getElementById("tVectorResult");
+  const exportBtn = document.getElementById("exportTransformTxtBtn");
 
   if (data.error) {
     panel.className = "result-panel error";
     panel.textContent = "Error: " + data.error;
     stepsBox.style.display = "none";
     vecResult.style.display = "none";
+    exportBtn.style.display = "none";
     return;
   }
 
   panel.className = "result-panel success";
+  exportBtn.style.display = "inline-flex";
 
   // Show matrix
   let html = '<table class="result-matrix"><tbody>';
@@ -319,6 +330,38 @@ function showTransformResult(data) {
   } else {
     vecResult.style.display = "none";
   }
+}
+
+function exportTransformTxt() {
+  if (!lastTransformCalc || !lastTransformCalc.data || lastTransformCalc.data.error) return;
+  const { t, payload, data } = lastTransformCalc;
+  let text = `========================================\n`;
+  text += ` LINEAR ALGEBRA SOLVER - TRANSFORMATION  \n`;
+  text += `========================================\n\n`;
+  text += `Type: ${t}\n`;
+  if (payload.params && Object.keys(payload.params).length > 0) {
+    text += `Parameters: ${JSON.stringify(payload.params)}\n`;
+  }
+
+  text += `\n--- TRANSFORMATION MATRIX T ---\n`;
+  if (data.transform_matrix) {
+    data.transform_matrix.forEach(row => {
+      text += `[ ${row.map(v => (typeof v === 'number' ? +v.toFixed(4) : v).toString().padStart(8)).join(" ")} ]\n`;
+    });
+  }
+
+  if (data.input_vector !== undefined) {
+    text += `\n--- VECTOR TRANSFORMATION ---\n`;
+    text += `Input Vector:  [ ${data.input_vector.join(", ")} ]\n`;
+    text += `Output Vector: [ ${data.output_vector.map(v => +v.toFixed(4)).join(", ")} ]\n`;
+  }
+
+  if (data.steps) {
+    text += `\n--- STEP-BY-STEP SOLUTION ---\n`;
+    text += data.steps + `\n`;
+  }
+
+  downloadTxtFile(`transformation_${t}_solution.txt`, text);
 }
 
 // Init

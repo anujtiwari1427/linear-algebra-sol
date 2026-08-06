@@ -73,7 +73,10 @@
 
     <!-- Result -->
     <div class="col-lg-6">
-      <h5>Result</h5>
+      <div class="result-header">
+        <h5 class="mb-0">Result</h5>
+        <button id="exportVecTxtBtn" class="btn btn-outline-success btn-sm export-btn" style="display:none" onclick="exportVectorTxt()">📥 Export as TXT</button>
+      </div>
       <div class="result-panel" id="vecResultPanel">
         <span class="text-muted">Result will appear here.</span>
       </div>
@@ -119,12 +122,16 @@ function readVec(n, prefix) {
   return Array.from({length: n}, (_, i) => parseFloat(document.getElementById(`${prefix}${i}`).value) || 0);
 }
 
+let lastVecCalc = null;
+
 function clearVec() {
   document.querySelectorAll("#vecAInputs input, #vecBInputs input").forEach(el => el.value = "0");
   const panel = document.getElementById("vecResultPanel");
   panel.className = "result-panel";
   panel.innerHTML = '<span class="text-muted">Result will appear here.</span>';
   document.getElementById("vecStepsBox").style.display = "none";
+  document.getElementById("exportVecTxtBtn").style.display = "none";
+  lastVecCalc = null;
 }
 
 async function calcVector() {
@@ -146,21 +153,25 @@ async function calcVector() {
     body: JSON.stringify(payload)
   });
   const data = await res.json();
+  lastVecCalc = { op, payload, data };
   showVecResult(data);
 }
 
 function showVecResult(data) {
   const panel = document.getElementById("vecResultPanel");
   const stepsBox = document.getElementById("vecStepsBox");
+  const exportBtn = document.getElementById("exportVecTxtBtn");
 
   if (data.error) {
     panel.className = "result-panel error";
     panel.textContent = "Error: " + data.error;
     stepsBox.style.display = "none";
+    exportBtn.style.display = "none";
     return;
   }
 
   panel.className = "result-panel success";
+  exportBtn.style.display = "inline-flex";
 
   if (Array.isArray(data.result)) {
     panel.innerHTML = `[ ${data.result.map(v => typeof v === 'number' ? v.toFixed(4).replace(/\.?0+$/, '') : v).join(", ")} ]`;
@@ -178,6 +189,40 @@ function showVecResult(data) {
   } else {
     stepsBox.style.display = "none";
   }
+}
+
+function exportVectorTxt() {
+  if (!lastVecCalc || !lastVecCalc.data || lastVecCalc.data.error) return;
+  const { op, payload, data } = lastVecCalc;
+  let text = `========================================\n`;
+  text += `   LINEAR ALGEBRA SOLVER - VECTORS      \n`;
+  text += `========================================\n\n`;
+  text += `Operation: ${op}\n\n`;
+
+  text += `Vector a: [ ${payload.vec_a.join(", ")} ]\n`;
+  if (payload.vec_b) {
+    text += `Vector b: [ ${payload.vec_b.join(", ")} ]\n`;
+  }
+  if (payload.scalar !== undefined) {
+    text += `Scalar: ${payload.scalar}\n`;
+  }
+
+  text += `\n--- RESULT ---\n`;
+  if (Array.isArray(data.result)) {
+    text += `Result Vector: [ ${data.result.map(v => typeof v === 'number' ? v.toFixed(4).replace(/\.?0+$/, '') : v).join(", ")} ]\n`;
+  } else if (typeof data.result === 'number') {
+    const unit = op === "angle" ? "°" : "";
+    text += `Result: ${data.result}${unit}\n`;
+  } else {
+    text += `Result: ${JSON.stringify(data.result)}\n`;
+  }
+
+  if (data.steps) {
+    text += `\n--- STEP-BY-STEP SOLUTION ---\n`;
+    text += data.steps + `\n`;
+  }
+
+  downloadTxtFile(`vector_${op}_solution.txt`, text);
 }
 
 // Init

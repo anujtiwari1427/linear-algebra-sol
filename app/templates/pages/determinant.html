@@ -58,7 +58,10 @@
 
     <!-- Result -->
     <div class="col-lg-7">
-      <h5>Result</h5>
+      <div class="result-header">
+        <h5 class="mb-0">Result</h5>
+        <button id="exportDetTxtBtn" class="btn btn-outline-success btn-sm export-btn" style="display:none" onclick="exportDetTxt()">📥 Export as TXT</button>
+      </div>
       <div class="result-panel" id="detResultPanel">
         <span class="text-muted">Result will appear here after clicking Calculate.</span>
       </div>
@@ -141,6 +144,8 @@ function fillRandom() {
     }
 }
 
+let lastDetCalc = null;
+
 function clearDet() {
   fillIdentity();
   const panel = document.getElementById("detResultPanel");
@@ -148,6 +153,8 @@ function clearDet() {
   panel.innerHTML = '<span class="text-muted">Result will appear here after clicking Calculate.</span>';
   document.getElementById("detStepsBox").style.display = "none";
   document.getElementById("detTablesSection").style.display = "none";
+  document.getElementById("exportDetTxtBtn").style.display = "none";
+  lastDetCalc = null;
 }
 
 async function calcDet() {
@@ -158,6 +165,7 @@ async function calcDet() {
     body: JSON.stringify({matrix})
   });
   const data = await res.json();
+  lastDetCalc = { matrix, data };
   showDetResult(data);
 }
 
@@ -165,16 +173,19 @@ function showDetResult(data) {
   const panel = document.getElementById("detResultPanel");
   const stepsBox = document.getElementById("detStepsBox");
   const tablesSection = document.getElementById("detTablesSection");
+  const exportBtn = document.getElementById("exportDetTxtBtn");
 
   if (data.error) {
     panel.className = "result-panel error";
     panel.textContent = "Error: " + data.error;
     stepsBox.style.display = "none";
     tablesSection.style.display = "none";
+    exportBtn.style.display = "none";
     return;
   }
 
   panel.className = "result-panel success";
+  exportBtn.style.display = "inline-flex";
 
   const singularBadge = data.singular
     ? '<span class="badge bg-danger ms-2">Singular (no inverse)</span>'
@@ -201,6 +212,44 @@ function showDetResult(data) {
   } else {
     tablesSection.style.display = "none";
   }
+}
+
+function exportDetTxt() {
+  if (!lastDetCalc || !lastDetCalc.data || lastDetCalc.data.error) return;
+  const { matrix, data } = lastDetCalc;
+  let text = `========================================\n`;
+  text += ` LINEAR ALGEBRA SOLVER - DETERMINANT   \n`;
+  text += `========================================\n\n`;
+
+  text += `--- INPUT MATRIX A ---\n`;
+  matrix.forEach(row => {
+    text += `[ ${row.map(v => String(v).padStart(6)).join(" ")} ]\n`;
+  });
+
+  text += `\n--- RESULT ---\n`;
+  text += `det(A) = ${data.det}\n`;
+  text += `Status: ${data.singular ? "Singular (no inverse)" : "Non-singular (invertible)"}\n`;
+
+  if (data.minors && data.minors.length > 0) {
+    text += `\n--- MINORS MATRIX (M) ---\n`;
+    data.minors.forEach(row => {
+      text += `[ ${row.map(v => String(v).padStart(6)).join(" ")} ]\n`;
+    });
+  }
+
+  if (data.cofactors && data.cofactors.length > 0) {
+    text += `\n--- COFACTORS MATRIX (C) ---\n`;
+    data.cofactors.forEach(row => {
+      text += `[ ${row.map(v => String(v).padStart(6)).join(" ")} ]\n`;
+    });
+  }
+
+  if (data.steps) {
+    text += `\n--- STEP-BY-STEP SOLUTION ---\n`;
+    text += data.steps + `\n`;
+  }
+
+  downloadTxtFile(`determinant_solution.txt`, text);
 }
 
 function buildTable(matrix) {

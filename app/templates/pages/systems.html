@@ -43,7 +43,10 @@
 
     <!-- Result -->
     <div class="col-lg-5">
-      <h5>Solution x</h5>
+      <div class="result-header">
+        <h5 class="mb-0">Solution x</h5>
+        <button id="exportSysTxtBtn" class="btn btn-outline-success btn-sm export-btn" style="display:none" onclick="exportSystemTxt()">📥 Export as TXT</button>
+      </div>
       <div class="result-panel" id="sysResultPanel">
         <span class="text-muted">Solution will appear here.</span>
       </div>
@@ -79,6 +82,8 @@ function buildSystem() {
   table.innerHTML = html;
 }
 
+let lastSysCalc = null;
+
 function clearSystem() {
   const n = parseInt(document.getElementById("sysN").value) || 2;
   for (let r = 0; r < n; r++) {
@@ -93,6 +98,8 @@ function clearSystem() {
   panel.className = "result-panel";
   panel.innerHTML = '<span class="text-muted">Solution will appear here.</span>';
   document.getElementById("sysStepsBox").style.display = "none";
+  document.getElementById("exportSysTxtBtn").style.display = "none";
+  lastSysCalc = null;
 }
 
 async function calcSystem() {
@@ -113,21 +120,26 @@ async function calcSystem() {
     body: JSON.stringify({A, b})
   });
   const data = await res.json();
+  lastSysCalc = { A, b, data };
   showSysResult(data, n);
 }
 
 function showSysResult(data, n) {
   const panel = document.getElementById("sysResultPanel");
   const stepsBox = document.getElementById("sysStepsBox");
+  const exportBtn = document.getElementById("exportSysTxtBtn");
 
   if (data.error) {
     panel.className = "result-panel error";
     panel.textContent = "Error: " + data.error;
     stepsBox.style.display = "none";
+    exportBtn.style.display = "none";
     return;
   }
 
   panel.className = "result-panel success";
+  exportBtn.style.display = "inline-flex";
+
   let html = "<ul class='mb-0'>";
   data.result.forEach((v, i) => {
     html += `<li><strong>x<sub>${i+1}</sub> = ${v}</strong></li>`;
@@ -141,6 +153,36 @@ function showSysResult(data, n) {
   } else {
     stepsBox.style.display = "none";
   }
+}
+
+function exportSystemTxt() {
+  if (!lastSysCalc || !lastSysCalc.data || lastSysCalc.data.error) return;
+  const { A, b, data } = lastSysCalc;
+  let text = `========================================\n`;
+  text += ` LINEAR ALGEBRA SOLVER - SYSTEM (Ax = b) \n`;
+  text += `========================================\n\n`;
+
+  text += `--- SYSTEM EQUATIONS ---\n`;
+  A.forEach((row, r) => {
+    let eqStr = row.map((coeff, c) => `${coeff}*(x${c+1})`).join(" + ");
+    text += `${eqStr} = ${b[r]}\n`;
+  });
+
+  text += `\n--- SOLUTION VECTOR x ---\n`;
+  if (Array.isArray(data.result)) {
+    data.result.forEach((v, i) => {
+      text += `x${i+1} = ${v}\n`;
+    });
+  } else {
+    text += `${JSON.stringify(data.result)}\n`;
+  }
+
+  if (data.steps) {
+    text += `\n--- STEP-BY-STEP SOLUTION ---\n`;
+    text += data.steps + `\n`;
+  }
+
+  downloadTxtFile(`system_solution.txt`, text);
 }
 
 buildSystem();

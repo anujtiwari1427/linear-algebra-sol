@@ -108,6 +108,22 @@ h1, h2, h3 {
 }
 
 /* ---- Result panel ---- */
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.export-btn {
+  font-size: 0.825rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .result-panel {
   background: white;
   border: 1px solid #dee2e6;

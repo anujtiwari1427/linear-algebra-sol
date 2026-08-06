@@ -76,7 +76,10 @@
 
     <!-- RIGHT: Result panel -->
     <div class="col-lg-6">
-      <h5>Result</h5>
+      <div class="result-header">
+        <h5 class="mb-0">Result</h5>
+        <button id="exportTxtBtn" class="btn btn-outline-success btn-sm export-btn" style="display:none" onclick="exportMatrixTxt()">📥 Export as TXT</button>
+      </div>
       <div class="result-panel" id="resultPanel">
         <span class="text-muted">Result will appear here after you click Calculate.</span>
       </div>
@@ -136,6 +139,8 @@ function readMatrix(rows, cols, prefix) {
   return m;
 }
 
+let lastMatrixCalc = null;
+
 function clearAll() {
   document.querySelectorAll("input[type=number][id^='a_'], input[type=number][id^='b_']")
     .forEach(el => el.value = "0");
@@ -143,6 +148,8 @@ function clearAll() {
   panel.className = "result-panel";
   panel.innerHTML = '<span class="text-muted">Result will appear here after you click Calculate.</span>';
   document.getElementById("stepsBox").style.display = "none";
+  document.getElementById("exportTxtBtn").style.display = "none";
+  lastMatrixCalc = null;
 }
 
 async function calculate() {
@@ -165,21 +172,25 @@ async function calculate() {
     body: JSON.stringify(payload)
   });
   const data = await res.json();
+  lastMatrixCalc = { op, payload, data };
   showResult(data);
 }
 
 function showResult(data) {
   const panel = document.getElementById("resultPanel");
   const stepsBox = document.getElementById("stepsBox");
+  const exportBtn = document.getElementById("exportTxtBtn");
 
   if (data.error) {
     panel.className = "result-panel error";
     panel.textContent = "Error: " + data.error;
     stepsBox.style.display = "none";
+    exportBtn.style.display = "none";
     return;
   }
 
   panel.className = "result-panel success";
+  exportBtn.style.display = "inline-flex";
 
   // Single scalar
   if (Array.isArray(data.result) && data.result.length === 1 && Array.isArray(data.result[0]) && data.result[0].length === 1) {
@@ -202,6 +213,43 @@ function showResult(data) {
   } else {
     stepsBox.style.display = "none";
   }
+}
+
+function exportMatrixTxt() {
+  if (!lastMatrixCalc || !lastMatrixCalc.data || lastMatrixCalc.data.error) return;
+  const { op, payload, data } = lastMatrixCalc;
+  let text = `========================================\n`;
+  text += `   LINEAR ALGEBRA SOLVER - MATRIX       \n`;
+  text += `========================================\n\n`;
+  text += `Operation: ${op}\n\n`;
+
+  text += `--- INPUT MATRIX A ---\n`;
+  payload.matrix_a.forEach(row => {
+    text += `[ ${row.map(v => String(v).padStart(6)).join(" ")} ]\n`;
+  });
+
+  if (payload.matrix_b) {
+    text += `\n--- INPUT MATRIX B ---\n`;
+    payload.matrix_b.forEach(row => {
+      text += `[ ${row.map(v => String(v).padStart(6)).join(" ")} ]\n`;
+    });
+  }
+
+  text += `\n--- RESULT ---\n`;
+  if (Array.isArray(data.result) && Array.isArray(data.result[0])) {
+    data.result.forEach(row => {
+      text += `[ ${row.map(v => (typeof v === 'number' ? v.toFixed(4).replace(/\.?0+$/, '') : String(v)).padStart(8)).join(" ")} ]\n`;
+    });
+  } else {
+    text += `${JSON.stringify(data.result)}\n`;
+  }
+
+  if (data.steps) {
+    text += `\n--- STEP-BY-STEP SOLUTION ---\n`;
+    text += data.steps + `\n`;
+  }
+
+  downloadTxtFile(`matrix_${op}_solution.txt`, text);
 }
 
 // Init
