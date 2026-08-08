@@ -1,16 +1,9 @@
 import numpy as np
 import math
 
-
 def solve_transform(transform_type, params, vector=None):
     """
-    Build a transformation matrix and optionally apply it to a vector/point.
-
-    transform_type: rotation_2d | rotation_3d_x | rotation_3d_y | rotation_3d_z |
-                    scale | shear_x | shear_y | reflect_x | reflect_y |
-                    reflect_origin | project_x | project_y | custom
-    params: dict of parameters (angle_deg, sx, sy, sz, shear, matrix)
-    vector: list of numbers to transform (optional)
+    Build transformation matrix and provide detailed step-by-step mathematical solutions.
     """
     try:
         T = _build_matrix(transform_type, params)
@@ -18,9 +11,11 @@ def solve_transform(transform_type, params, vector=None):
             return {"error": f"Unknown transform type: {transform_type}"}
 
         matrix_list = [[round(float(v), 6) for v in row] for row in T.tolist()]
+        steps = _describe_detailed(transform_type, params, T, vector)
+
         result = {
             "transform_matrix": matrix_list,
-            "steps": _describe(transform_type, params, T)
+            "steps": steps
         }
 
         if vector is not None:
@@ -109,29 +104,46 @@ def _build_matrix(t, p):
     return None
 
 
-def _describe(t, p, T):
-    deg = p.get("angle_deg", 0)
-    lines = []
-    labels = {
-        "rotation_2d":   f"2D rotation by {deg}°",
-        "rotation_3d_x": f"3D rotation around X-axis by {deg}°",
-        "rotation_3d_y": f"3D rotation around Y-axis by {deg}°",
-        "rotation_3d_z": f"3D rotation around Z-axis by {deg}°",
-        "scale":         f"Scale: sx={p.get('sx',1)}, sy={p.get('sy',1)}" + (f", sz={p.get('sz','')}" if p.get("sz") else ""),
-        "shear_x":       f"Horizontal shear (k={p.get('shear',0)}): x' = x + k·y",
-        "shear_y":       f"Vertical shear (k={p.get('shear',0)}): y' = k·x + y",
-        "reflect_x":     "Reflection across X-axis: y → −y",
-        "reflect_y":     "Reflection across Y-axis: x → −x",
-        "reflect_origin":"Reflection through origin: (x,y) → (−x,−y)",
-        "project_x":     "Orthogonal projection onto X-axis: y → 0",
-        "project_y":     "Orthogonal projection onto Y-axis: x → 0",
-        "custom":        "Custom transformation matrix",
-    }
-    lines.append(labels.get(t, t))
-    det = round(float(np.linalg.det(T)), 6)
-    lines.append(f"det(T) = {det}  (scale factor of the transformation)")
+def _describe_detailed(t, p, T, vector=None):
+    steps = []
+    deg = float(p.get("angle_deg", 0))
+    rad = math.radians(deg)
+    det = float(np.linalg.det(T))
+
+    steps.append(f"📌 Step 1: Transformation Matrix Construction ({T.shape[0]}×{T.shape[1]})")
+    
+    if "rotation" in t:
+        steps.append(f"  • Angle θ = {deg}° ({rad:.4f} rad)")
+        steps.append(f"  • cos({deg}°) = {math.cos(rad):.4g}, sin({deg}°) = {math.sin(rad):.4g}")
+
+    steps.append(_format_matrix(T))
+
+    steps.append(f"\n📌 Step 2: Determinant & Geometric Scale Factor")
+    steps.append(f"  • det(T) = {det:.6g}")
     if abs(det) < 1e-10:
-        lines.append("det = 0: this transform collapses space (not invertible).")
-    elif abs(abs(det) - 1) < 1e-6:
-        lines.append("det = ±1: this is a rigid/orthogonal transform (preserves lengths).")
+        steps.append("  • det = 0: Transformation collapses space into a lower dimension (Non-invertible).")
+    elif abs(abs(det) - 1.0) < 1e-6:
+        steps.append("  • det = ±1: Rigid transformation (preserves area / volume & distances).")
+    else:
+        steps.append(f"  • Area/Volume scaling factor is |det(T)| = {abs(det):.4g}.")
+
+    if vector is not None:
+        v = np.array(vector, dtype=float)
+        tv = T @ v
+        steps.append(f"\n📌 Step 3: Apply Transformation Matrix T to Vector v = {v.tolist()}")
+        steps.append(f"  Matrix-Vector Product Equation T · v = v':")
+        for i in range(T.shape[0]):
+            terms = [f"({T[i,k]:.4g} × {v[k]:.4g})" for k in range(T.shape[1])]
+            terms_str = " + ".join(terms)
+            steps.append(f"  • v'[{i+1}] = {terms_str} = {tv[i]:.6g}")
+        steps.append(f"\n✅ Transformed Output Vector v' = {[round(float(x), 6) for x in tv.tolist()]}")
+
+    return "\n".join(steps)
+
+
+def _format_matrix(M):
+    lines = []
+    for row in M:
+        formatted_row = "  ".join(f"{v:8.4g}" for v in row)
+        lines.append(f"  [ {formatted_row} ]")
     return "\n".join(lines)
