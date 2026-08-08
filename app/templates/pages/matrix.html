@@ -67,6 +67,17 @@
             <div id="gridB" class="matrix-grid mb-3"></div>
           </div>
 
+          <!-- Quick fill buttons -->
+          <div class="mb-3">
+            <span class="text-muted small d-block mb-1">Quick fill:</span>
+            <div class="btn-group btn-group-sm flex-wrap gap-1">
+              <button class="btn btn-outline-secondary" onclick="fillRandomA()">🎲 Random A</button>
+              <button id="btnRandomB" class="btn btn-outline-secondary" style="display:none" onclick="fillRandomB()">🎲 Random B</button>
+              <button class="btn btn-outline-secondary" onclick="fillIdentityA()">1️⃣ Identity A</button>
+              <button class="btn btn-outline-secondary" onclick="fillZerosA()">0️⃣ Zeros</button>
+            </div>
+          </div>
+
           <button class="btn btn-primary" onclick="calculate()">Calculate</button>
           <button class="btn btn-outline-secondary ms-2" onclick="clearAll()">Clear</button>
 
@@ -104,6 +115,8 @@ function updateUI() {
   document.getElementById("matrixBSection").style.display = isSingle ? "none" : "block";
   document.getElementById("sizeBWrapper").style.display = isSingle ? "none" : "inline-block";
   document.getElementById("colsBWrapper").style.display = isSingle ? "none" : "inline-block";
+  const btnB = document.getElementById("btnRandomB");
+  if (btnB) btnB.style.display = isSingle ? "none" : "inline-block";
 }
 
 function buildGrids() {
@@ -113,6 +126,50 @@ function buildGrids() {
   const cB = parseInt(document.getElementById("colsB").value) || 2;
   buildGrid("gridA", rA, cA, "a");
   buildGrid("gridB", rB, cB, "b");
+}
+
+function fillRandomA() {
+  const rA = parseInt(document.getElementById("rowsA").value) || 2;
+  const cA = parseInt(document.getElementById("colsA").value) || 2;
+  for (let r = 0; r < rA; r++) {
+    for (let c = 0; c < cA; c++) {
+      const el = document.getElementById(`a_${r}_${c}`);
+      if (el) el.value = Math.floor(Math.random() * 19) - 9;
+    }
+  }
+}
+
+function fillRandomB() {
+  const rB = parseInt(document.getElementById("rowsB").value) || 2;
+  const cB = parseInt(document.getElementById("colsB").value) || 2;
+  for (let r = 0; r < rB; r++) {
+    for (let c = 0; c < cB; c++) {
+      const el = document.getElementById(`b_${r}_${c}`);
+      if (el) el.value = Math.floor(Math.random() * 19) - 9;
+    }
+  }
+}
+
+function fillIdentityA() {
+  const rA = parseInt(document.getElementById("rowsA").value) || 2;
+  const cA = parseInt(document.getElementById("colsA").value) || 2;
+  for (let r = 0; r < rA; r++) {
+    for (let c = 0; c < cA; c++) {
+      const el = document.getElementById(`a_${r}_${c}`);
+      if (el) el.value = r === c ? "1" : "0";
+    }
+  }
+}
+
+function fillZerosA() {
+  const rA = parseInt(document.getElementById("rowsA").value) || 2;
+  const cA = parseInt(document.getElementById("colsA").value) || 2;
+  for (let r = 0; r < rA; r++) {
+    for (let c = 0; c < cA; c++) {
+      const el = document.getElementById(`a_${r}_${c}`);
+      if (el) el.value = "0";
+    }
+  }
 }
 
 function buildGrid(divId, rows, cols, prefix) {
@@ -151,7 +208,8 @@ function clearAll() {
   panel.className = "result-panel";
   panel.innerHTML = '<span class="text-muted">Result will appear here after you click Calculate.</span>';
   document.getElementById("stepsBox").style.display = "none";
-  document.getElementById("exportTxtBtn").style.display = "none";
+  const btnGroup = document.getElementById("exportBtnGroup");
+  if (btnGroup) btnGroup.style.display = "none";
   lastMatrixCalc = null;
 }
 
@@ -176,30 +234,27 @@ async function calculate() {
   });
   const data = await res.json();
   lastMatrixCalc = { op, payload, data };
+
   showResult(data);
 }
 
 function showResult(data) {
   const panel = document.getElementById("resultPanel");
   const stepsBox = document.getElementById("stepsBox");
-  const exportBtn = document.getElementById("exportTxtBtn");
+  const exportBtnGroup = document.getElementById("exportBtnGroup");
 
   if (data.error) {
+    if (exportBtnGroup) exportBtnGroup.style.display = "none";
     panel.className = "result-panel error";
-    panel.textContent = "Error: " + data.error;
+    panel.innerHTML = `<strong>Error:</strong> ${data.error}`;
     stepsBox.style.display = "none";
-    exportBtn.style.display = "none";
     return;
   }
 
   if (exportBtnGroup) exportBtnGroup.style.display = "flex";
   panel.className = "result-panel success";
 
-  // Single scalar
-  if (Array.isArray(data.result) && data.result.length === 1 && Array.isArray(data.result[0]) && data.result[0].length === 1) {
-    panel.innerHTML = `<strong>${data.result[0][0]}</strong>`;
-  } else if (Array.isArray(data.result) && Array.isArray(data.result[0])) {
-    // Matrix result
+  if (Array.isArray(data.result) && Array.isArray(data.result[0])) {
     let html = '<table class="result-matrix"><tbody>';
     data.result.forEach(row => {
       html += "<tr>" + row.map(v => `<td>${typeof v === 'number' ? v.toFixed(4).replace(/\.?0+$/, '') : v}</td>`).join("") + "</tr>";

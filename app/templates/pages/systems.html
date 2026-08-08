@@ -1,19 +1,19 @@
 {% extends "layouts/base.html" %}
-{% block title %}Systems of Equations — Linear Algebra Solver{% endblock %}
+{% block title %}Systems of Linear Equations — Linear Algebra Solver{% endblock %}
 
 {% block content %}
 
 <div class="calc-header">
   <div class="container">
-    <h1>Systems of Linear Equations (Ax = b)</h1>
-    <p>Enter the coefficient matrix A and constants b to solve the system.</p>
+    <h1>Systems of Equations Solver</h1>
+    <p>Solve system Ax = b step-by-step using Gaussian elimination.</p>
   </div>
 </div>
 
 <div class="container mb-5">
   <div class="row g-4">
 
-    <!-- Input -->
+    <!-- LEFT: Input panel -->
     <div class="col-lg-7">
       <div class="card">
         <div class="card-body">
@@ -34,6 +34,15 @@
             </table>
           </div>
 
+          <!-- Quick fill buttons -->
+          <div class="mb-3">
+            <span class="text-muted small d-block mb-1">Quick fill:</span>
+            <div class="btn-group btn-group-sm flex-wrap gap-1">
+              <button class="btn btn-outline-secondary" onclick="fillRandomSystem()">🎲 Random System</button>
+              <button class="btn btn-outline-secondary" onclick="fillZerosSystem()">0️⃣ Zeros</button>
+            </div>
+          </div>
+
           <button class="btn btn-primary" onclick="calcSystem()">Solve</button>
           <button class="btn btn-outline-secondary ms-2" onclick="clearSystem()">Clear</button>
 
@@ -41,7 +50,7 @@
       </div>
     </div>
 
-    <!-- Result -->
+    <!-- RIGHT: Result -->
     <div class="col-lg-5">
       <div class="result-header">
         <h5 class="mb-0">Solution x</h5>
@@ -70,43 +79,42 @@ function buildSystem() {
   for (let r = 0; r < n; r++) {
     html += "<tr>";
     for (let c = 0; c < n; c++) {
-      html += `<td><input type="number" id="sys_a_${r}_${c}" value="0"></td>`;
-      if (c < n - 1) {
-        html += `<td style="text-align:center; padding:0 4px; color:#6c757d; font-size:0.9rem">x<sub>${c+1}</sub> +</td>`;
-      } else {
-        html += `<td style="text-align:center; padding:0 4px; color:#6c757d; font-size:0.9rem">x<sub>${c+1}</sub></td>`;
-      }
+      const plus = c < n - 1 ? " + " : "";
+      html += `<td><input type="number" id="sys_a_${r}_${c}" value="${r === c ? 1 : 0}"> x<sub>${c+1}</sub>${plus}</td>`;
     }
     html += `<td class="eq-sign">=</td>`;
-    html += `<td><input type="number" id="sys_b_${r}" value="0"></td>`;
+    html += `<td><input type="number" id="sys_b_${r}" value="1"></td>`;
     html += "</tr>";
   }
   html += "</tbody>";
   table.innerHTML = html;
 }
 
-let lastSysCalc = null;
+function fillRandomSystem() {
+  const n = parseInt(document.getElementById("sysN").value) || 2;
+  for (let r = 0; r < n; r++) {
+    for (let c = 0; c < n; c++) {
+      const el = document.getElementById(`sys_a_${r}_${c}`);
+      if (el) el.value = Math.floor(Math.random() * 19) - 9;
+    }
+    const elB = document.getElementById(`sys_b_${r}`);
+    if (elB) elB.value = Math.floor(Math.random() * 19) - 9;
+  }
+}
 
-function clearSystem() {
+function fillZerosSystem() {
   const n = parseInt(document.getElementById("sysN").value) || 2;
   for (let r = 0; r < n; r++) {
     for (let c = 0; c < n; c++) {
       const el = document.getElementById(`sys_a_${r}_${c}`);
       if (el) el.value = "0";
     }
-    const bEl = document.getElementById(`sys_b_${r}`);
-    if (bEl) bEl.value = "0";
+    const elB = document.getElementById(`sys_b_${r}`);
+    if (elB) elB.value = "0";
   }
-  const panel = document.getElementById("sysResultPanel");
-  panel.className = "result-panel";
-  panel.innerHTML = '<span class="text-muted">Solution will appear here.</span>';
-  document.getElementById("sysStepsBox").style.display = "none";
-  document.getElementById("exportSysTxtBtn").style.display = "none";
-  lastSysCalc = null;
 }
 
-async function calcSystem() {
-  const n = parseInt(document.getElementById("sysN").value) || 2;
+function readSystem(n) {
   const A = [], b = [];
   for (let r = 0; r < n; r++) {
     const row = [];
@@ -116,14 +124,34 @@ async function calcSystem() {
     A.push(row);
     b.push(parseFloat(document.getElementById(`sys_b_${r}`).value) || 0);
   }
+  return { A, b };
+}
+
+let lastSysCalc = null;
+
+function clearSystem() {
+  document.querySelectorAll("input[type=number][id^='sys_']").forEach(el => el.value = "0");
+  const panel = document.getElementById("sysResultPanel");
+  panel.className = "result-panel";
+  panel.innerHTML = '<span class="text-muted">Solution will appear here.</span>';
+  document.getElementById("sysStepsBox").style.display = "none";
+  const btnGroup = document.getElementById("exportSysBtnGroup");
+  if (btnGroup) btnGroup.style.display = "none";
+  lastSysCalc = null;
+}
+
+async function calcSystem() {
+  const n = parseInt(document.getElementById("sysN").value) || 2;
+  const { A, b } = readSystem(n);
 
   const res = await fetch("/api/systems", {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({A, b})
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ matrix_a: A, vector_b: b })
   });
   const data = await res.json();
   lastSysCalc = { A, b, data };
+
   showSysResult(data, n);
 }
 

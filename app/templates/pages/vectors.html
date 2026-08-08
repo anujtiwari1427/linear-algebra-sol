@@ -64,8 +64,19 @@
             <input type="number" class="form-control mb-3" id="scalarVal" value="2" style="width:120px">
           </div>
 
+          <!-- Quick fill buttons -->
+          <div class="mb-3">
+            <span class="text-muted small d-block mb-1">Quick fill:</span>
+            <div class="btn-group btn-group-sm flex-wrap gap-1">
+              <button class="btn btn-outline-secondary" onclick="fillRandomVecA()">🎲 Random a</button>
+              <button id="btnRandomVecB" class="btn btn-outline-secondary" onclick="fillRandomVecB()">🎲 Random b</button>
+              <button class="btn btn-outline-secondary" onclick="fillZerosVec()">0️⃣ Zeros</button>
+            </div>
+          </div>
+
           <button class="btn btn-primary" onclick="calcVector()">Calculate</button>
           <button class="btn btn-outline-secondary ms-2" onclick="clearVec()">Clear</button>
+
 
         </div>
       </div>
@@ -100,8 +111,37 @@ function updateVecUI() {
   const isSingle = singleVecOps.includes(op);
   document.getElementById("vecBSection").style.display = isSingle ? "none" : "block";
   document.getElementById("scalarSection").style.display = op === "scalar_multiply" ? "block" : "none";
+  const btnB = document.getElementById("btnRandomVecB");
+  if (btnB) btnB.style.display = isSingle ? "none" : "inline-block";
   if (op === "cross") document.getElementById("vecSize").value = "3";
 }
+
+function fillRandomVecA() {
+  const n = parseInt(document.getElementById("vecSize").value) || 3;
+  for (let i = 0; i < n; i++) {
+    const el = document.getElementById(`a_${i}`);
+    if (el) el.value = Math.floor(Math.random() * 19) - 9;
+  }
+}
+
+function fillRandomVecB() {
+  const n = parseInt(document.getElementById("vecSize").value) || 3;
+  for (let i = 0; i < n; i++) {
+    const el = document.getElementById(`b_${i}`);
+    if (el) el.value = Math.floor(Math.random() * 19) - 9;
+  }
+}
+
+function fillZerosVec() {
+  const n = parseInt(document.getElementById("vecSize").value) || 3;
+  for (let i = 0; i < n; i++) {
+    const elA = document.getElementById(`a_${i}`);
+    const elB = document.getElementById(`b_${i}`);
+    if (elA) elA.value = "0";
+    if (elB) elB.value = "0";
+  }
+}
+
 
 function buildVectorInputs() {
   const n = parseInt(document.getElementById("vecSize").value) || 3;

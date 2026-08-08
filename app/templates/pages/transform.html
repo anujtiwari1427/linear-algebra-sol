@@ -101,6 +101,15 @@
             <div class="vector-input" id="transformVecInputs"></div>
           </div>
 
+          <!-- Quick fill buttons -->
+          <div class="mb-3">
+            <span class="text-muted small d-block mb-1">Quick fill:</span>
+            <div class="btn-group btn-group-sm flex-wrap gap-1">
+              <button class="btn btn-outline-secondary" onclick="fillRandomTransformVec()">🎲 Random Vector</button>
+              <button id="btnRandomCustomMat" class="btn btn-outline-secondary" style="display:none" onclick="fillRandomCustomMat()">🎲 Random Custom Matrix</button>
+            </div>
+          </div>
+
           <button class="btn btn-primary" onclick="calcTransform()">Compute</button>
           <button class="btn btn-outline-secondary ms-2" onclick="clearTransform()">Clear</button>
 
@@ -183,9 +192,34 @@ function updateTransformUI() {
   document.getElementById("customParam").style.display = needsCustom.includes(t) ? "block" : "none";
   document.getElementById("scaleZWrapper").style.display = needs3D.includes(t) ? "inline-block" : "none";
 
+  const btnCustomMat = document.getElementById("btnRandomCustomMat");
+  if (btnCustomMat) btnCustomMat.style.display = needsCustom.includes(t) ? "inline-block" : "none";
+
   // Rebuild vector inputs with correct length
   if (document.getElementById("applyVector").checked) {
     buildTransformVec(needs3D.includes(t) ? 3 : 2);
+  }
+}
+
+function fillRandomTransformVec() {
+  document.getElementById("applyVector").checked = true;
+  updateVectorSection();
+  const t = document.getElementById("tType").value;
+  const n = needs3D.includes(t) ? 3 : 2;
+  for (let i = 0; i < n; i++) {
+    const el = document.getElementById(`tv_${i}`);
+    if (el) el.value = Math.floor(Math.random() * 19) - 9;
+  }
+}
+
+function fillRandomCustomMat() {
+  const rows = parseInt(document.getElementById("customRows").value) || 2;
+  const cols = parseInt(document.getElementById("customCols").value) || 2;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const el = document.getElementById(`cg_${r}_${c}`);
+      if (el) el.value = Math.floor(Math.random() * 19) - 9;
+    }
   }
 }
 
