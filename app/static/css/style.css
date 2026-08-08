@@ -270,7 +270,7 @@ label.form-label {
 }
 
 /* ===============================
-   Sidebar Navigation Layout
+   Sidebar Navigation Layout (Right Side)
    =============================== */
 
 body.app-layout {
@@ -289,11 +289,11 @@ body.app-layout {
     min-width: 250px;
     position: fixed;
     top: 0;
-    left: 0;
+    right: 0;
     bottom: 0;
     z-index: 1030;
     background-color: #212529;
-    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.15);
+    box-shadow: -2px 0 12px rgba(0, 0, 0, 0.15);
   }
 
   .sidebar-wrapper .navbar {
@@ -301,7 +301,8 @@ body.app-layout {
   }
 
   .app-main-content {
-    margin-left: 250px;
+    margin-right: 250px;
+    margin-left: 0;
     flex: 1;
     min-width: 0;
     display: flex;
@@ -319,6 +320,7 @@ body.app-layout {
   }
 
   .app-main-content {
+    margin-right: 0;
     margin-left: 0;
     flex: 1;
   }
@@ -352,4 +354,5 @@ body.app-layout {
   margin-right: 10px;
   font-size: 1.1rem;
 }
+
 
