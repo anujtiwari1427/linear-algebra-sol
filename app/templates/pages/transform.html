@@ -112,7 +112,10 @@
     <div class="col-lg-7">
       <div class="result-header">
         <h5 class="mb-0">Transformation Matrix</h5>
-        <button id="exportTransformTxtBtn" class="btn btn-outline-success btn-sm export-btn" style="display:none" onclick="exportTransformTxt()">📥 Export as TXT</button>
+        <div id="exportTransformBtnGroup" style="display:none" class="d-flex gap-2">
+          <button id="exportTransformTxtBtn" class="btn btn-outline-success btn-sm export-btn" onclick="exportTransformTxt()">📥 Export TXT</button>
+          <button id="exportTransformPdfBtn" class="btn btn-outline-danger btn-sm export-btn" onclick="exportTransformPdf()">📄 Export PDF</button>
+        </div>
       </div>
       <div class="result-panel" id="tResultPanel">
         <span class="text-muted">Result will appear here.</span>
@@ -290,19 +293,19 @@ function showTransformResult(data) {
   const panel = document.getElementById("tResultPanel");
   const stepsBox = document.getElementById("tStepsBox");
   const vecResult = document.getElementById("tVectorResult");
-  const exportBtn = document.getElementById("exportTransformTxtBtn");
+  const exportBtnGroup = document.getElementById("exportTransformBtnGroup");
 
   if (data.error) {
+    if (exportBtnGroup) exportBtnGroup.style.display = "none";
     panel.className = "result-panel error";
-    panel.textContent = "Error: " + data.error;
+    panel.innerHTML = `<strong>Error:</strong> ${data.error}`;
     stepsBox.style.display = "none";
     vecResult.style.display = "none";
-    exportBtn.style.display = "none";
     return;
   }
 
+  if (exportBtnGroup) exportBtnGroup.style.display = "flex";
   panel.className = "result-panel success";
-  exportBtn.style.display = "inline-flex";
 
   // Show matrix
   let html = '<table class="result-matrix"><tbody>';
@@ -362,6 +365,35 @@ function exportTransformTxt() {
   }
 
   downloadTxtFile(`transformation_${t}_solution.txt`, text);
+}
+
+function exportTransformPdf() {
+  if (!lastTransformCalc || !lastTransformCalc.data || lastTransformCalc.data.error) return;
+  const { t, payload, data } = lastTransformCalc;
+  let text = `Type: ${t}\n`;
+  if (payload.params && Object.keys(payload.params).length > 0) {
+    text += `Parameters: ${JSON.stringify(payload.params)}\n`;
+  }
+
+  text += `\n--- TRANSFORMATION MATRIX T ---\n`;
+  if (data.transform_matrix) {
+    data.transform_matrix.forEach(row => {
+      text += `[ ${row.map(v => (typeof v === 'number' ? +v.toFixed(4) : v).toString().padStart(8)).join(" ")} ]\n`;
+    });
+  }
+
+  if (data.input_vector !== undefined) {
+    text += `\n--- VECTOR TRANSFORMATION ---\n`;
+    text += `Input Vector:  [ ${data.input_vector.join(", ")} ]\n`;
+    text += `Output Vector: [ ${data.output_vector.map(v => +v.toFixed(4)).join(", ")} ]\n`;
+  }
+
+  if (data.steps) {
+    text += `\n--- DETAILED STEP-BY-STEP SOLUTION ---\n`;
+    text += data.steps + `\n`;
+  }
+
+  downloadPdfFile(`transformation_${t}_solution.pdf`, `Transformation Solution: ${t}`, text);
 }
 
 // Init

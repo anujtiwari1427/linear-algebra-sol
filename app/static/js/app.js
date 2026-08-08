@@ -15,6 +15,66 @@ function downloadTxtFile(filename, textContent) {
   URL.revokeObjectURL(url);
 }
 
+/**
+ * Helper function to trigger a PDF file download in the browser using jsPDF.
+ * @param {string} filename - The name of the file to save (e.g. 'matrix_solution.pdf')
+ * @param {string} title - Title header inside the PDF document
+ * @param {string} textContent - The step-by-step solution text content
+ */
+function downloadPdfFile(filename, title, textContent) {
+  try {
+    if (window.jspdf && window.jspdf.jsPDF) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      
+      // Header Bar
+      doc.setFillColor(33, 37, 41);
+      doc.rect(0, 0, 210, 22, "F");
+      
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(13);
+      doc.text(title || "Linear Algebra Detailed Solution", 14, 14);
+      
+      doc.setTextColor(33, 37, 41);
+      doc.setFont("courier", "normal");
+      doc.setFontSize(9.5);
+      
+      const lines = doc.splitTextToSize(textContent, 180);
+      let y = 30;
+      const lineHeight = 4.8;
+      const pageHeight = doc.internal.pageSize.height;
+      
+      for (let i = 0; i < lines.length; i++) {
+        if (y + lineHeight > pageHeight - 15) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.text(lines[i], 14, y);
+        y += lineHeight;
+      }
+      
+      const pageCount = doc.internal.getNumberOfPages();
+      doc.setFont("helvetica", "italic");
+      doc.setFontSize(8);
+      doc.setTextColor(120, 120, 120);
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.text(`Linear Algebra Solver — Page ${i} of ${pageCount}`, 14, pageHeight - 8);
+      }
+      
+      doc.save(filename.endsWith(".pdf") ? filename : `${filename}.pdf`);
+    } else {
+      window.print();
+    }
+  } catch (err) {
+    console.error("PDF export error:", err);
+    alert("Could not generate PDF. Printing page instead.");
+    window.print();
+  }
+}
+
+
 // Highlight active sidebar navigation item & handle open/close toggle
 document.addEventListener("DOMContentLoaded", () => {
   const currentPath = window.location.pathname;

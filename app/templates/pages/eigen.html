@@ -37,7 +37,10 @@
     <div class="col-lg-7">
       <div class="result-header">
         <h5 class="mb-0">Eigenvalues &amp; Eigenvectors</h5>
-        <button id="exportEigenTxtBtn" class="btn btn-outline-success btn-sm export-btn" style="display:none" onclick="exportEigenTxt()">📥 Export as TXT</button>
+        <div id="exportEigenBtnGroup" style="display:none" class="d-flex gap-2">
+          <button id="exportEigenTxtBtn" class="btn btn-outline-success btn-sm export-btn" onclick="exportEigenTxt()">📥 Export TXT</button>
+          <button id="exportEigenPdfBtn" class="btn btn-outline-danger btn-sm export-btn" onclick="exportEigenPdf()">📄 Export PDF</button>
+        </div>
       </div>
       <div class="result-panel" id="eigenResultPanel">
         <span class="text-muted">Results will appear here.</span>
@@ -109,24 +112,24 @@ async function calcEigen() {
 function showEigenResult(data) {
   const panel = document.getElementById("eigenResultPanel");
   const stepsBox = document.getElementById("eigenStepsBox");
-  const exportBtn = document.getElementById("exportEigenTxtBtn");
+  const exportBtnGroup = document.getElementById("exportEigenBtnGroup");
 
   if (data.error) {
+    if (exportBtnGroup) exportBtnGroup.style.display = "none";
     panel.className = "result-panel error";
-    panel.textContent = "Error: " + data.error;
+    panel.innerHTML = `<strong>Error:</strong> ${data.error}`;
     stepsBox.style.display = "none";
-    exportBtn.style.display = "none";
     return;
   }
 
+  if (exportBtnGroup) exportBtnGroup.style.display = "flex";
   panel.className = "result-panel success";
-  exportBtn.style.display = "inline-flex";
 
-  let html = "";
-
-  // Eigenvalues
-  html += "<strong>Eigenvalues (λ):</strong> ";
-  html += data.eigenvalues.map((v, i) => `λ<sub>${i+1}</sub> = ${v}`).join(" &nbsp;|&nbsp; ");
+  let html = "<strong>Eigenvalues (&lambda;):</strong><ul class='mt-1 mb-2'>";
+  data.eigenvalues.forEach((v, i) => {
+    html += `<li>&lambda;<sub>${i+1}</sub> = <strong>${v}</strong></li>`;
+  });
+  html += "</ul>";
   html += "<hr class='my-2'>";
 
   // Eigenvectors
@@ -179,6 +182,37 @@ function exportEigenTxt() {
 
   downloadTxtFile(`eigen_solution.txt`, text);
 }
+
+function exportEigenPdf() {
+  if (!lastEigenCalc || !lastEigenCalc.data || lastEigenCalc.data.error) return;
+  const { matrix, data } = lastEigenCalc;
+  let text = `--- INPUT MATRIX A ---\n`;
+  matrix.forEach(row => {
+    text += `[ ${row.map(v => String(v).padStart(6)).join(" ")} ]\n`;
+  });
+
+  text += `\n--- EIGENVALUES (λ) ---\n`;
+  if (data.eigenvalues) {
+    data.eigenvalues.forEach((v, i) => {
+      text += `λ${i+1} = ${v}\n`;
+    });
+  }
+
+  text += `\n--- EIGENVECTORS (v) ---\n`;
+  if (data.eigenvectors) {
+    data.eigenvectors.forEach((vec, i) => {
+      text += `v${i+1} = [ ${vec.join(", ")} ]\n`;
+    });
+  }
+
+  if (data.steps) {
+    text += `\n--- DETAILED STEP-BY-STEP SOLUTION ---\n`;
+    text += data.steps + `\n`;
+  }
+
+  downloadPdfFile(`eigen_solution.pdf`, `Eigenvalues & Eigenvectors Solution`, text);
+}
+
 
 buildEigenGrid();
 </script>

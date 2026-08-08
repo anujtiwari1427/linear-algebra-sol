@@ -45,7 +45,10 @@
     <div class="col-lg-5">
       <div class="result-header">
         <h5 class="mb-0">Solution x</h5>
-        <button id="exportSysTxtBtn" class="btn btn-outline-success btn-sm export-btn" style="display:none" onclick="exportSystemTxt()">📥 Export as TXT</button>
+        <div id="exportSysBtnGroup" style="display:none" class="d-flex gap-2">
+          <button id="exportSysTxtBtn" class="btn btn-outline-success btn-sm export-btn" onclick="exportSystemTxt()">📥 Export TXT</button>
+          <button id="exportSysPdfBtn" class="btn btn-outline-danger btn-sm export-btn" onclick="exportSystemPdf()">📄 Export PDF</button>
+        </div>
       </div>
       <div class="result-panel" id="sysResultPanel">
         <span class="text-muted">Solution will appear here.</span>
@@ -127,18 +130,18 @@ async function calcSystem() {
 function showSysResult(data, n) {
   const panel = document.getElementById("sysResultPanel");
   const stepsBox = document.getElementById("sysStepsBox");
-  const exportBtn = document.getElementById("exportSysTxtBtn");
+  const exportBtnGroup = document.getElementById("exportSysBtnGroup");
 
   if (data.error) {
+    if (exportBtnGroup) exportBtnGroup.style.display = "none";
     panel.className = "result-panel error";
-    panel.textContent = "Error: " + data.error;
+    panel.innerHTML = `<strong>Error:</strong> ${data.error}`;
     stepsBox.style.display = "none";
-    exportBtn.style.display = "none";
     return;
   }
 
+  if (exportBtnGroup) exportBtnGroup.style.display = "flex";
   panel.className = "result-panel success";
-  exportBtn.style.display = "inline-flex";
 
   let html = "<ul class='mb-0'>";
   data.result.forEach((v, i) => {
@@ -183,6 +186,32 @@ function exportSystemTxt() {
   }
 
   downloadTxtFile(`system_solution.txt`, text);
+}
+
+function exportSystemPdf() {
+  if (!lastSysCalc || !lastSysCalc.data || lastSysCalc.data.error) return;
+  const { A, b, data } = lastSysCalc;
+  let text = `--- SYSTEM EQUATIONS ---\n`;
+  A.forEach((row, r) => {
+    let eqStr = row.map((coeff, c) => `${coeff}*(x${c+1})`).join(" + ");
+    text += `${eqStr} = ${b[r]}\n`;
+  });
+
+  text += `\n--- SOLUTION VECTOR x ---\n`;
+  if (Array.isArray(data.result)) {
+    data.result.forEach((v, i) => {
+      text += `x${i+1} = ${v}\n`;
+    });
+  } else {
+    text += `${JSON.stringify(data.result)}\n`;
+  }
+
+  if (data.steps) {
+    text += `\n--- DETAILED STEP-BY-STEP SOLUTION ---\n`;
+    text += data.steps + `\n`;
+  }
+
+  downloadPdfFile(`system_solution.pdf`, `System of Equations Ax = b Solution`, text);
 }
 
 buildSystem();

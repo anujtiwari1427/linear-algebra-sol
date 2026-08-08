@@ -60,7 +60,10 @@
     <div class="col-lg-7">
       <div class="result-header">
         <h5 class="mb-0">Result</h5>
-        <button id="exportDetTxtBtn" class="btn btn-outline-success btn-sm export-btn" style="display:none" onclick="exportDetTxt()">📥 Export as TXT</button>
+        <div id="exportDetBtnGroup" style="display:none" class="d-flex gap-2">
+          <button id="exportDetTxtBtn" class="btn btn-outline-success btn-sm export-btn" onclick="exportDetTxt()">📥 Export TXT</button>
+          <button id="exportDetPdfBtn" class="btn btn-outline-danger btn-sm export-btn" onclick="exportDetPdf()">📄 Export PDF</button>
+        </div>
       </div>
       <div class="result-panel" id="detResultPanel">
         <span class="text-muted">Result will appear here after clicking Calculate.</span>
@@ -172,30 +175,24 @@ async function calcDet() {
 function showDetResult(data) {
   const panel = document.getElementById("detResultPanel");
   const stepsBox = document.getElementById("detStepsBox");
+  const exportBtnGroup = document.getElementById("exportDetBtnGroup");
   const tablesSection = document.getElementById("detTablesSection");
-  const exportBtn = document.getElementById("exportDetTxtBtn");
 
   if (data.error) {
+    if (exportBtnGroup) exportBtnGroup.style.display = "none";
     panel.className = "result-panel error";
-    panel.textContent = "Error: " + data.error;
+    panel.innerHTML = `<strong>Error:</strong> ${data.error}`;
     stepsBox.style.display = "none";
     tablesSection.style.display = "none";
-    exportBtn.style.display = "none";
     return;
   }
 
+  if (exportBtnGroup) exportBtnGroup.style.display = "flex";
   panel.className = "result-panel success";
-  exportBtn.style.display = "inline-flex";
-
-  const singularBadge = data.singular
-    ? '<span class="badge bg-danger ms-2">Singular (no inverse)</span>'
-    : '<span class="badge bg-success ms-2">Non-singular (invertible)</span>';
-
-  panel.innerHTML = `
-    <div style="font-size:1.3rem; font-weight:600;">
-      det(A) = ${data.det} ${singularBadge}
-    </div>
-  `;
+  panel.innerHTML = `<div class="fs-4 fw-bold">det(A) = ${data.det}</div>
+                     <span class="badge ${data.singular ? 'bg-danger' : 'bg-success'} mt-1">
+                       ${data.singular ? 'Singular (no inverse)' : 'Non-singular (invertible)'}
+                     </span>`;
 
   if (data.steps) {
     stepsBox.textContent = data.steps;
@@ -250,6 +247,40 @@ function exportDetTxt() {
   }
 
   downloadTxtFile(`determinant_solution.txt`, text);
+}
+
+function exportDetPdf() {
+  if (!lastDetCalc || !lastDetCalc.data || lastDetCalc.data.error) return;
+  const { matrix, data } = lastDetCalc;
+  let text = `--- INPUT MATRIX A ---\n`;
+  matrix.forEach(row => {
+    text += `[ ${row.map(v => String(v).padStart(6)).join(" ")} ]\n`;
+  });
+
+  text += `\n--- RESULT ---\n`;
+  text += `det(A) = ${data.det}\n`;
+  text += `Status: ${data.singular ? "Singular (no inverse)" : "Non-singular (invertible)"}\n`;
+
+  if (data.minors && data.minors.length > 0) {
+    text += `\n--- MINORS MATRIX (M) ---\n`;
+    data.minors.forEach(row => {
+      text += `[ ${row.map(v => String(v).padStart(6)).join(" ")} ]\n`;
+    });
+  }
+
+  if (data.cofactors && data.cofactors.length > 0) {
+    text += `\n--- COFACTORS MATRIX (C) ---\n`;
+    data.cofactors.forEach(row => {
+      text += `[ ${row.map(v => String(v).padStart(6)).join(" ")} ]\n`;
+    });
+  }
+
+  if (data.steps) {
+    text += `\n--- DETAILED STEP-BY-STEP SOLUTION ---\n`;
+    text += data.steps + `\n`;
+  }
+
+  downloadPdfFile(`determinant_solution.pdf`, `Determinant Solution`, text);
 }
 
 function buildTable(matrix) {

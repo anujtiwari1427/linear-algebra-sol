@@ -78,7 +78,10 @@
     <div class="col-lg-6">
       <div class="result-header">
         <h5 class="mb-0">Result</h5>
-        <button id="exportTxtBtn" class="btn btn-outline-success btn-sm export-btn" style="display:none" onclick="exportMatrixTxt()">📥 Export as TXT</button>
+        <div id="exportBtnGroup" style="display:none" class="d-flex gap-2">
+          <button id="exportTxtBtn" class="btn btn-outline-success btn-sm export-btn" onclick="exportMatrixTxt()">📥 Export TXT</button>
+          <button id="exportPdfBtn" class="btn btn-outline-danger btn-sm export-btn" onclick="exportMatrixPdf()">📄 Export PDF</button>
+        </div>
       </div>
       <div class="result-panel" id="resultPanel">
         <span class="text-muted">Result will appear here after you click Calculate.</span>
@@ -189,8 +192,8 @@ function showResult(data) {
     return;
   }
 
+  if (exportBtnGroup) exportBtnGroup.style.display = "flex";
   panel.className = "result-panel success";
-  exportBtn.style.display = "inline-flex";
 
   // Single scalar
   if (Array.isArray(data.result) && data.result.length === 1 && Array.isArray(data.result[0]) && data.result[0].length === 1) {
@@ -250,6 +253,40 @@ function exportMatrixTxt() {
   }
 
   downloadTxtFile(`matrix_${op}_solution.txt`, text);
+}
+
+function exportMatrixPdf() {
+  if (!lastMatrixCalc || !lastMatrixCalc.data || lastMatrixCalc.data.error) return;
+  const { op, payload, data } = lastMatrixCalc;
+  let text = `Operation: ${op}\n\n`;
+
+  text += `--- INPUT MATRIX A ---\n`;
+  payload.matrix_a.forEach(row => {
+    text += `[ ${row.map(v => String(v).padStart(6)).join(" ")} ]\n`;
+  });
+
+  if (payload.matrix_b) {
+    text += `\n--- INPUT MATRIX B ---\n`;
+    payload.matrix_b.forEach(row => {
+      text += `[ ${row.map(v => String(v).padStart(6)).join(" ")} ]\n`;
+    });
+  }
+
+  text += `\n--- RESULT ---\n`;
+  if (Array.isArray(data.result) && Array.isArray(data.result[0])) {
+    data.result.forEach(row => {
+      text += `[ ${row.map(v => (typeof v === 'number' ? v.toFixed(4).replace(/\.?0+$/, '') : String(v)).padStart(8)).join(" ")} ]\n`;
+    });
+  } else {
+    text += `${JSON.stringify(data.result)}\n`;
+  }
+
+  if (data.steps) {
+    text += `\n--- DETAILED STEP-BY-STEP SOLUTION ---\n`;
+    text += data.steps + `\n`;
+  }
+
+  downloadPdfFile(`matrix_${op}_solution.pdf`, `Matrix Solution: ${op}`, text);
 }
 
 // Init

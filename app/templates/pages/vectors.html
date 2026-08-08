@@ -75,7 +75,10 @@
     <div class="col-lg-6">
       <div class="result-header">
         <h5 class="mb-0">Result</h5>
-        <button id="exportVecTxtBtn" class="btn btn-outline-success btn-sm export-btn" style="display:none" onclick="exportVectorTxt()">📥 Export as TXT</button>
+        <div id="exportVecBtnGroup" style="display:none" class="d-flex gap-2">
+          <button id="exportVecTxtBtn" class="btn btn-outline-success btn-sm export-btn" onclick="exportVectorTxt()">📥 Export TXT</button>
+          <button id="exportVecPdfBtn" class="btn btn-outline-danger btn-sm export-btn" onclick="exportVectorPdf()">📄 Export PDF</button>
+        </div>
       </div>
       <div class="result-panel" id="vecResultPanel">
         <span class="text-muted">Result will appear here.</span>
@@ -160,21 +163,21 @@ async function calcVector() {
 function showVecResult(data) {
   const panel = document.getElementById("vecResultPanel");
   const stepsBox = document.getElementById("vecStepsBox");
-  const exportBtn = document.getElementById("exportVecTxtBtn");
+  const exportBtnGroup = document.getElementById("exportVecBtnGroup");
 
   if (data.error) {
+    if (exportBtnGroup) exportBtnGroup.style.display = "none";
     panel.className = "result-panel error";
-    panel.textContent = "Error: " + data.error;
+    panel.innerHTML = `<strong>Error:</strong> ${data.error}`;
     stepsBox.style.display = "none";
-    exportBtn.style.display = "none";
     return;
   }
 
+  if (exportBtnGroup) exportBtnGroup.style.display = "flex";
   panel.className = "result-panel success";
-  exportBtn.style.display = "inline-flex";
 
   if (Array.isArray(data.result)) {
-    panel.innerHTML = `[ ${data.result.map(v => typeof v === 'number' ? v.toFixed(4).replace(/\.?0+$/, '') : v).join(", ")} ]`;
+    panel.innerHTML = `<strong>Result Vector:</strong> [ ${data.result.map(v => typeof v === 'number' ? v.toFixed(4).replace(/\.?0+$/, '') : v).join(", ")} ]`;
   } else if (typeof data.result === 'number') {
     const op = document.getElementById("vecOp").value;
     const unit = op === "angle" ? "°" : "";
@@ -224,6 +227,38 @@ function exportVectorTxt() {
 
   downloadTxtFile(`vector_${op}_solution.txt`, text);
 }
+
+function exportVectorPdf() {
+  if (!lastVecCalc || !lastVecCalc.data || lastVecCalc.data.error) return;
+  const { op, payload, data } = lastVecCalc;
+  let text = `Operation: ${op}\n\n`;
+
+  text += `Vector a: [ ${payload.vec_a.join(", ")} ]\n`;
+  if (payload.vec_b) {
+    text += `Vector b: [ ${payload.vec_b.join(", ")} ]\n`;
+  }
+  if (payload.scalar !== undefined) {
+    text += `Scalar: ${payload.scalar}\n`;
+  }
+
+  text += `\n--- RESULT ---\n`;
+  if (Array.isArray(data.result)) {
+    text += `Result Vector: [ ${data.result.map(v => typeof v === 'number' ? v.toFixed(4).replace(/\.?0+$/, '') : v).join(", ")} ]\n`;
+  } else if (typeof data.result === 'number') {
+    const unit = op === "angle" ? "°" : "";
+    text += `Result: ${data.result}${unit}\n`;
+  } else {
+    text += `Result: ${JSON.stringify(data.result)}\n`;
+  }
+
+  if (data.steps) {
+    text += `\n--- DETAILED STEP-BY-STEP SOLUTION ---\n`;
+    text += data.steps + `\n`;
+  }
+
+  downloadPdfFile(`vector_${op}_solution.pdf`, `Vector Solution: ${op}`, text);
+}
+
 
 // Init
 updateVecUI();
