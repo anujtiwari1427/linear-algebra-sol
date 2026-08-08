@@ -1,37 +1,60 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <div class="container">
-    <a class="navbar-brand" href="/">&#8747; Linear Algebra Solver</a>
-    <button class="navbar-toggler" type="button"
-            data-bs-toggle="collapse" data-bs-target="#navMenu">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navMenu">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="/">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/calculators/matrix/">Matrix</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/calculators/determinants/">Determinants</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/calculators/vectors/">Vectors</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/calculators/systems/">Systems</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/calculators/eigen/">Eigenvalues</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/calculators/transform/">Transform</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/#about">About</a>
-        </li>
-      </ul>
+<aside class="sidebar-wrapper">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark flex-lg-column align-items-lg-start h-100 p-0">
+    <div class="container-fluid flex-lg-column align-items-lg-start px-3 py-3">
+      <div class="d-flex align-items-center justify-content-between w-100 mb-lg-4">
+        <a class="navbar-brand d-flex align-items-center m-0 fs-5 font-weight-bold" href="/">
+          <span class="brand-icon">∫</span>
+          <span>Linear Algebra</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      </div>
+
+      <div class="collapse navbar-collapse w-100" id="sidebarMenu">
+        <ul class="navbar-nav flex-column w-100 gap-1">
+          <li class="nav-item">
+            <a class="nav-link py-2 px-3 rounded" href="/">
+              <span class="nav-icon me-2">🏠</span> Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link py-2 px-3 rounded" href="/calculators/matrix/">
+              <span class="nav-icon me-2">🔢</span> Matrix
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link py-2 px-3 rounded" href="/calculators/determinants/">
+              <span class="nav-icon me-2">📊</span> Determinants
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link py-2 px-3 rounded" href="/calculators/vectors/">
+              <span class="nav-icon me-2">➡️</span> Vectors
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link py-2 px-3 rounded" href="/calculators/systems/">
+              <span class="nav-icon me-2">🔗</span> Systems
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link py-2 px-3 rounded" href="/calculators/eigen/">
+              <span class="nav-icon me-2">λ</span> Eigenvalues
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link py-2 px-3 rounded" href="/calculators/transform/">
+              <span class="nav-icon me-2">↺</span> Transform
+            </a>
+          </li>
+          <li class="nav-item mt-lg-3 border-top border-secondary pt-2">
+            <a class="nav-link py-2 px-3 rounded" href="/#about">
+              <span class="nav-icon me-2">👥</span> About
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
+</aside>
