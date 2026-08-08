@@ -1,4 +1,4 @@
-<aside class="sidebar-wrapper">
+<aside class="sidebar-wrapper" id="sidebarWrapper">
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark flex-lg-column align-items-lg-start h-100 p-0">
     <div class="container-fluid flex-lg-column align-items-lg-start px-3 py-3">
       <div class="d-flex align-items-center justify-content-between w-100 mb-lg-4">
@@ -6,9 +6,16 @@
           <span class="brand-icon">∫</span>
           <span>Linear Algebra</span>
         </a>
-        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
+        <div class="d-flex align-items-center gap-2">
+          <!-- Toggle button for mobile -->
+          <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <!-- Close button for desktop sidebar -->
+          <button class="btn btn-outline-light btn-sm d-none d-lg-inline-flex align-items-center justify-content-center sidebar-toggle-btn" id="sidebarCloseBtn" title="Close Sidebar">
+            ✕
+          </button>
+        </div>
       </div>
 
       <div class="collapse navbar-collapse w-100" id="sidebarMenu">
@@ -48,7 +55,17 @@
               <span class="nav-icon me-2">↺</span> Transform
             </a>
           </li>
-          <li class="nav-item mt-lg-3 border-top border-secondary pt-2">
+          <li class="nav-item mt-lg-2 border-top border-secondary pt-2">
+            <a class="nav-link py-2 px-3 rounded" href="/solutions/">
+              <span class="nav-icon me-2">📝</span> Detailed Solutions
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link py-2 px-3 rounded" href="/concepts/">
+              <span class="nav-icon me-2">💡</span> Explanation of Concepts
+            </a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link py-2 px-3 rounded" href="/#about">
               <span class="nav-icon me-2">👥</span> About
             </a>
@@ -57,4 +74,4 @@
       </div>
     </div>
   </nav>
-</aside>
+</aside>

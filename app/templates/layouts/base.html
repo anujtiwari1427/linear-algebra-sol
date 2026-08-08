@@ -15,6 +15,9 @@
 {% include 'components/navbar.html' %}
 
 <div class="app-main-content">
+  <button class="btn btn-dark sidebar-open-btn shadow" id="sidebarOpenBtn" title="Open Navigation Menu">
+    <span>☰</span> <span class="d-none d-sm-inline ms-1">Menu</span>
+  </button>
   <main>
   {% block content %}{% endblock %}
   </main>

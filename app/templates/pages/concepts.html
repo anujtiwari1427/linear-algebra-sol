@@ -1,0 +1,128 @@
+{% extends "layouts/base.html" %}
+{% block title %}Explanation of Concepts — Linear Algebra Solver{% endblock %}
+
+{% block content %}
+<div class="calc-header">
+  <div class="container">
+    <h1>💡 Explanation of Concepts</h1>
+    <p>Master core linear algebra concepts with clear definitions, formulas, and intuitive guides.</p>
+  </div>
+</div>
+
+<div class="container mb-5">
+  <div class="row g-4">
+    
+    <div class="col-lg-4 col-md-6">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body p-4">
+          <div class="badge bg-primary mb-2">Fundamental</div>
+          <h4>Matrices &amp; Operations</h4>
+          <p class="text-muted small">
+            A matrix is a rectangular array of numbers arranged in rows and columns. Matrix multiplication requires the number of columns in \(A\) to match rows in \(B\).
+          </p>
+          <hr>
+          <p class="mb-1 fw-bold small">Key Formulas:</p>
+          <code class="d-block bg-light p-2 rounded small text-dark mb-2">
+            (A &times; B)<sub>ij</sub> = &sum; A<sub>ik</sub> B<sub>kj</sub>
+          </code>
+          <code class="d-block bg-light p-2 rounded small text-dark">
+            (A<sup>T</sup>)<sub>ij</sub> = A<sub>ji</sub>
+          </code>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body p-4">
+          <div class="badge bg-success mb-2">Properties</div>
+          <h4>Determinants &amp; Inverses</h4>
+          <p class="text-muted small">
+            The determinant measures the scaling factor of the transformation induced by a matrix. A matrix is invertible if and only if \(\det(A) \neq 0\).
+          </p>
+          <hr>
+          <p class="mb-1 fw-bold small">Key Formulas:</p>
+          <code class="d-block bg-light p-2 rounded small text-dark mb-2">
+            det(A<sup>-1</sup>) = 1 / det(A)
+          </code>
+          <code class="d-block bg-light p-2 rounded small text-dark">
+            A<sup>-1</sup> = (1 / det(A)) &middot; adj(A)
+          </code>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body p-4">
+          <div class="badge bg-info text-dark mb-2">Geometry</div>
+          <h4>Vectors &amp; Dot/Cross Products</h4>
+          <p class="text-muted small">
+            Vectors represent quantities with magnitude and direction. Dot products measure alignment/projection, while cross products produce perpendicular vectors.
+          </p>
+          <hr>
+          <p class="mb-1 fw-bold small">Key Formulas:</p>
+          <code class="d-block bg-light p-2 rounded small text-dark mb-2">
+            u &middot; v = |u||v| cos(&theta;)
+          </code>
+          <code class="d-block bg-light p-2 rounded small text-dark">
+            |u &times; v| = |u||v| sin(&theta;)
+          </code>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body p-4">
+          <div class="badge bg-warning text-dark mb-2">Algebra</div>
+          <h4>Linear Systems \(Ax = b\)</h4>
+          <p class="text-muted small">
+            A linear system can have exactly one unique solution, infinitely many solutions, or no solution (inconsistent). Solved via Gaussian elimination to RREF.
+          </p>
+          <hr>
+          <p class="mb-1 fw-bold small">Rouché-Capelli Theorem:</p>
+          <span class="small text-secondary">
+            System is consistent if rank(A) = rank([A|b]). Unique if rank equals number of variables.
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body p-4">
+          <div class="badge bg-danger mb-2">Advanced</div>
+          <h4>Eigenvalues &amp; Eigenvectors</h4>
+          <p class="text-muted small">
+            Eigenvectors are non-zero vectors whose direction is unchanged by a transformation \(A\); they are scaled by eigenvalue \(\lambda\).
+          </p>
+          <hr>
+          <p class="mb-1 fw-bold small">Characteristic Equation:</p>
+          <code class="d-block bg-light p-2 rounded small text-dark">
+            det(A - &lambda;I) = 0
+          </code>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body p-4">
+          <div class="badge bg-secondary mb-2">Transformation</div>
+          <h4>Linear Transformations</h4>
+          <p class="text-muted small">
+            Functions between vector spaces that preserve vector addition and scalar multiplication: \(T(cu + v) = cT(u) + T(v)\).
+          </p>
+          <hr>
+          <p class="mb-1 fw-bold small">Common 2D Matrices:</p>
+          <span class="small text-secondary">
+            Rotation: \(\begin{bmatrix}\cos\theta &amp; -\sin\theta \\ \sin\theta &amp; \cos\theta\end{bmatrix}\)
+          </span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

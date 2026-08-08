@@ -1,0 +1,109 @@
+{% extends "layouts/base.html" %}
+{% block title %}Detailed Solutions — Linear Algebra Solver{% endblock %}
+
+{% block content %}
+<div class="calc-header">
+  <div class="container">
+    <h1>📝 Detailed Solutions Guide</h1>
+    <p>Comprehensive step-by-step breakdown of how our solver engine handles linear algebra calculations.</p>
+  </div>
+</div>
+
+<div class="container mb-5">
+  <div class="row g-4">
+    
+    <div class="col-md-6">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-3">
+            <span class="fs-2 me-3">🔢</span>
+            <div>
+              <h4 class="card-title mb-0">Matrix Operations &amp; Inverse</h4>
+              <span class="badge bg-primary">Step-by-Step Gauss-Jordan</span>
+            </div>
+          </div>
+          <p class="card-text text-muted">
+            Learns matrix addition, scalar multiplication, transposed orientation, and matrix inversion using row operations on an augmented matrix \([A \mid I]\).
+          </p>
+          <ul class="small text-secondary">
+            <li>Gauss-Jordan Elimination steps</li>
+            <li>Determinant non-zero condition verification</li>
+            <li>Matrix rank &amp; trace calculation</li>
+          </ul>
+          <a href="/calculators/matrix/" class="btn btn-outline-primary btn-sm">Try Matrix Solver &rarr;</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-3">
+            <span class="fs-2 me-3">📊</span>
+            <div>
+              <h4 class="card-title mb-0">Determinants &amp; Minors</h4>
+              <span class="badge bg-success">Cofactor Expansion</span>
+            </div>
+          </div>
+          <p class="card-text text-muted">
+            Provides complete minor &amp; cofactor expansion tables alongside row-reduction techniques for higher-order matrices.
+          </p>
+          <ul class="small text-secondary">
+            <li>Laplace expansion along any row or column</li>
+            <li>Sub-matrix minor calculations</li>
+            <li>Singularity check &amp; properties</li>
+          </ul>
+          <a href="/calculators/determinants/" class="btn btn-outline-success btn-sm">Try Determinant Solver &rarr;</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-3">
+            <span class="fs-2 me-3">🔗</span>
+            <div>
+              <h4 class="card-title mb-0">Systems of Equations \(Ax = b\)</h4>
+              <span class="badge bg-info text-dark">Gaussian Elimination</span>
+            </div>
+          </div>
+          <p class="card-text text-muted">
+            Solves linear equation systems showing forward elimination to Row Echelon Form (REF) followed by back substitution.
+          </p>
+          <ul class="small text-secondary">
+            <li>Unique, infinite, or no solution detection</li>
+            <li>Augmented matrix transformation steps</li>
+            <li>Cramer's rule &amp; Matrix inversion methods</li>
+          </ul>
+          <a href="/calculators/systems/" class="btn btn-outline-info btn-sm">Try System Solver &rarr;</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-3">
+            <span class="fs-2 me-3">λ</span>
+            <div>
+              <h4 class="card-title mb-0">Eigenvalues &amp; Eigenvectors</h4>
+              <span class="badge bg-warning text-dark">Characteristic Polynomial</span>
+            </div>
+          </div>
+          <p class="card-text text-muted">
+            Computes characteristic equations \(\det(A - \lambda I) = 0\), roots, and solves nullspace \((A - \lambda I)v = 0\) for eigenvectors.
+          </p>
+          <ul class="small text-secondary">
+            <li>Polynomial root finding</li>
+            <li>Eigenspace basis extraction</li>
+            <li>Diagonalization &amp; algebraic multiplicity</li>
+          </ul>
+          <a href="/calculators/eigen/" class="btn btn-outline-warning btn-sm">Try Eigenvalue Solver &rarr;</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
