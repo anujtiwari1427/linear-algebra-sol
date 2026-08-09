@@ -157,7 +157,7 @@ async function calcSystem() {
     const res = await fetch("/api/systems", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ matrix_a: A, vector_b: b })
+      body: JSON.stringify({ A: A, b: b })
     });
     const data = await res.json();
     lastSysCalc = { A, b, data };
