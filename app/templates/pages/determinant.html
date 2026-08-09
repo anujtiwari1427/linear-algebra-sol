@@ -6,7 +6,7 @@
 <div class="calc-header">
   <div class="container">
     <h1>Determinant Calculator</h1>
-    <p>Step-by-step cofactor expansion with minors and cofactors table.</p>
+    <p>Compute matrix determinants det(A) with step-by-step cofactor expansion, minors, and cofactors matrices.</p>
   </div>
 </div>
 
@@ -15,43 +15,50 @@
 
     <!-- Input -->
     <div class="col-lg-5">
-      <div class="card">
+      <div class="card h-100">
         <div class="card-body">
 
-          <div class="mb-3">
-            <label class="form-label" for="detN">Matrix size (n×n)</label>
-            <input type="number" id="detN" class="form-control" value="2"
-                   min="1" max="6" style="width:80px" onchange="buildDetGrid()">
+          <div class="mb-4">
+            <label class="form-label fw-bold" for="detN">Matrix Dimension (n × n)</label>
+            <input type="number" id="detN" class="form-control form-control-lg text-center font-monospace shadow-sm" value="2"
+                   min="1" max="6" style="width:100px; border-radius: var(--radius-md);" onchange="buildDetGrid()">
           </div>
 
-          <label class="form-label">Matrix A</label>
-          <div id="detGrid" class="matrix-grid mb-3"></div>
+          <div class="mb-4">
+            <label class="form-label fw-bold d-block">Matrix A</label>
+            <div class="matrix-bracket-wrapper">
+              <div id="detGrid" class="matrix-grid"></div>
+            </div>
+          </div>
 
           <!-- Quick fill buttons -->
-          <div class="mb-3">
-            <span class="text-muted small me-2">Quick fill:</span>
-            <button class="btn btn-sm btn-outline-secondary me-1" onclick="fillIdentity()">Identity</button>
-            <button class="btn btn-sm btn-outline-secondary me-1" onclick="fillRandom()">Random</button>
-            <button class="btn btn-sm btn-outline-secondary" onclick="fillZero()">Zeros</button>
+          <div class="mb-4">
+            <span class="text-muted small d-block mb-2 fw-semibold">Quick Presets:</span>
+            <div class="d-flex flex-wrap gap-2">
+              <button class="btn btn-outline-secondary btn-sm" onclick="fillIdentity()">1️⃣ Identity</button>
+              <button class="btn btn-outline-secondary btn-sm" onclick="fillRandom()">🎲 Random</button>
+              <button class="btn btn-outline-secondary btn-sm" onclick="fillZero()">0️⃣ Zeros</button>
+            </div>
           </div>
 
-          <button class="btn btn-primary" onclick="calcDet()">Calculate</button>
-          <button class="btn btn-outline-secondary ms-2" onclick="clearDet()">Clear</button>
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary px-4" onclick="calcDet()">Calculate</button>
+            <button class="btn btn-outline-secondary px-3" onclick="clearDet()">Clear</button>
+          </div>
 
-        </div>
-      </div>
+          <hr class="my-4">
 
-      <!-- What is a determinant? -->
-      <div class="card mt-3">
-        <div class="card-body">
-          <h6 class="card-title">What is a Determinant?</h6>
-          <ul class="small text-muted mb-0">
-            <li>det(A) ≠ 0 → matrix is <strong>invertible</strong></li>
-            <li>det(A) = 0 → matrix is <strong>singular</strong> (no inverse)</li>
-            <li>|det(A)| = scale factor of the linear map</li>
-            <li>det(AB) = det(A) × det(B)</li>
-            <li>det(Aᵀ) = det(A)</li>
-          </ul>
+          <div>
+            <h6 class="fw-bold mb-2">Key Properties of Determinants:</h6>
+            <ul class="small text-muted ps-3 mb-0 leading-relaxed">
+              <li class="mb-1">\(\det(A) \neq 0\) &rarr; matrix is <strong>invertible</strong> (non-singular).</li>
+              <li class="mb-1">\(\det(A) = 0\) &rarr; matrix is <strong>singular</strong> (no inverse).</li>
+              <li class="mb-1">\(|\det(A)|\) represents the volume scaling factor.</li>
+              <li class="mb-1">\(\det(AB) = \det(A) \times \det(B)\).</li>
+              <li>\(\det(A^T) = \det(A)\).</li>
+            </ul>
+          </div>
+
         </div>
       </div>
     </div>
@@ -59,27 +66,29 @@
     <!-- Result -->
     <div class="col-lg-7">
       <div class="result-header">
-        <h5 class="mb-0">Result</h5>
+        <h5 class="mb-0 fw-bold">Output Solution</h5>
         <div id="exportDetBtnGroup" style="display:none" class="d-flex gap-2">
-          <button id="exportDetTxtBtn" class="btn btn-outline-success btn-sm export-btn" onclick="exportDetTxt()">📥 Export TXT</button>
-          <button id="exportDetPdfBtn" class="btn btn-outline-danger btn-sm export-btn" onclick="exportDetPdf()">📄 Export PDF</button>
+          <button id="exportDetTxtBtn" class="btn btn-outline-secondary btn-sm export-btn" onclick="exportDetTxt()">📥 Export TXT</button>
+          <button id="exportDetPdfBtn" class="btn btn-outline-secondary btn-sm export-btn" onclick="exportDetPdf()">📄 Export PDF</button>
         </div>
       </div>
+      
       <div class="result-panel" id="detResultPanel">
-        <span class="text-muted">Result will appear here after clicking Calculate.</span>
+        <span class="text-muted">Fill matrix values and click <strong>Calculate</strong> to compute.</span>
       </div>
-      <div id="detStepsBox" class="steps-box mt-2" style="display:none"></div>
+      
+      <div id="detStepsBox" class="steps-box" style="display:none"></div>
 
       <!-- Minors/Cofactors table -->
       <div id="detTablesSection" style="display:none" class="mt-4">
         <div class="row g-3">
           <div class="col-md-6">
-            <h6>Minors Matrix (M)</h6>
-            <div id="minorsTable"></div>
+            <h6 class="fw-bold mb-2">Minors Matrix (M)</h6>
+            <div id="minorsTable" class="matrix-bracket-wrapper w-100 justify-content-center"></div>
           </div>
           <div class="col-md-6">
-            <h6>Cofactors Matrix (C)</h6>
-            <div id="cofactorsTable"></div>
+            <h6 class="fw-bold mb-2">Cofactors Matrix (C)</h6>
+            <div id="cofactorsTable" class="matrix-bracket-wrapper w-100 justify-content-center"></div>
           </div>
         </div>
       </div>
@@ -97,7 +106,7 @@ let currentN = 2;
 function buildDetGrid() {
   currentN = parseInt(document.getElementById("detN").value) || 2;
   const div = document.getElementById("detGrid");
-  div.style.gridTemplateColumns = `repeat(${currentN}, 60px)`;
+  div.style.gridTemplateColumns = `repeat(${currentN}, 64px)`;
   div.innerHTML = "";
   for (let r = 0; r < currentN; r++) {
     for (let c = 0; c < currentN; c++) {
@@ -153,23 +162,28 @@ function clearDet() {
   fillIdentity();
   const panel = document.getElementById("detResultPanel");
   panel.className = "result-panel";
-  panel.innerHTML = '<span class="text-muted">Result will appear here after clicking Calculate.</span>';
+  panel.innerHTML = '<span class="text-muted">Fill matrix values and click <strong>Calculate</strong> to compute.</span>';
   document.getElementById("detStepsBox").style.display = "none";
   document.getElementById("detTablesSection").style.display = "none";
-  document.getElementById("exportDetTxtBtn").style.display = "none";
+  const btnGroup = document.getElementById("exportDetBtnGroup");
+  if (btnGroup) btnGroup.style.display = "none";
   lastDetCalc = null;
 }
 
 async function calcDet() {
   const matrix = readMatrix();
-  const res = await fetch("/api/determinants", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({matrix})
-  });
-  const data = await res.json();
-  lastDetCalc = { matrix, data };
-  showDetResult(data);
+  try {
+    const res = await fetch("/api/determinants", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({matrix})
+    });
+    const data = await res.json();
+    lastDetCalc = { matrix, data };
+    showDetResult(data);
+  } catch (err) {
+    showDetResult({ error: "Failed to connect to calculation service." });
+  }
 }
 
 function showDetResult(data) {
@@ -189,10 +203,12 @@ function showDetResult(data) {
 
   if (exportBtnGroup) exportBtnGroup.style.display = "flex";
   panel.className = "result-panel success";
-  panel.innerHTML = `<div class="fs-4 fw-bold">det(A) = ${data.det}</div>
-                     <span class="badge ${data.singular ? 'bg-danger' : 'bg-success'} mt-1">
-                       ${data.singular ? 'Singular (no inverse)' : 'Non-singular (invertible)'}
-                     </span>`;
+  panel.innerHTML = `<div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                      <div class="fs-3 fw-bold text-primary">det(A) = ${data.det}</div>
+                      <span class="badge ${data.singular ? 'bg-danger' : 'bg-success'} px-3 py-2 fs-6">
+                        ${data.singular ? 'Singular (No Inverse)' : 'Non-Singular (Invertible)'}
+                      </span>
+                    </div>`;
 
   if (data.steps) {
     stepsBox.textContent = data.steps;

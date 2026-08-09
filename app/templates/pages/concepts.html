@@ -5,7 +5,7 @@
 <div class="calc-header">
   <div class="container">
     <h1>💡 Explanation of Concepts</h1>
-    <p>Master core linear algebra concepts with clear definitions, formulas, and intuitive guides.</p>
+    <p>Master core linear algebra concepts with clear definitions, mathematical formulas, and intuitive explanations.</p>
   </div>
 </div>
 
@@ -13,19 +13,19 @@
   <div class="row g-4">
     
     <div class="col-lg-4 col-md-6">
-      <div class="card h-100 shadow-sm border-0">
+      <div class="card h-100">
         <div class="card-body p-4">
-          <div class="badge bg-primary mb-2">Fundamental</div>
-          <h4>Matrices &amp; Operations</h4>
-          <p class="text-muted small">
-            A matrix is a rectangular array of numbers arranged in rows and columns. Matrix multiplication requires the number of columns in \(A\) to match rows in \(B\).
+          <div class="badge bg-primary mb-3 px-3 py-2">Fundamental</div>
+          <h4 class="fw-bold mb-2">Matrices &amp; Operations</h4>
+          <p class="text-muted small leading-relaxed">
+            A matrix is a rectangular array of numbers arranged in rows and columns. Matrix multiplication requires the column count of \(A\) to equal the row count of \(B\).
           </p>
-          <hr>
-          <p class="mb-1 fw-bold small">Key Formulas:</p>
-          <code class="d-block bg-light p-2 rounded small text-dark mb-2">
+          <hr class="my-3">
+          <p class="mb-2 fw-bold small">Key Formulas:</p>
+          <code class="d-block bg-light p-2 rounded small text-dark mb-2 font-monospace">
             (A &times; B)<sub>ij</sub> = &sum; A<sub>ik</sub> B<sub>kj</sub>
           </code>
-          <code class="d-block bg-light p-2 rounded small text-dark">
+          <code class="d-block bg-light p-2 rounded small text-dark font-monospace">
             (A<sup>T</sup>)<sub>ij</sub> = A<sub>ji</sub>
           </code>
         </div>
@@ -33,19 +33,19 @@
     </div>
 
     <div class="col-lg-4 col-md-6">
-      <div class="card h-100 shadow-sm border-0">
+      <div class="card h-100">
         <div class="card-body p-4">
-          <div class="badge bg-success mb-2">Properties</div>
-          <h4>Determinants &amp; Inverses</h4>
-          <p class="text-muted small">
+          <div class="badge bg-success mb-3 px-3 py-2">Properties</div>
+          <h4 class="fw-bold mb-2">Determinants &amp; Inverses</h4>
+          <p class="text-muted small leading-relaxed">
             The determinant measures the scaling factor of the transformation induced by a matrix. A matrix is invertible if and only if \(\det(A) \neq 0\).
           </p>
-          <hr>
-          <p class="mb-1 fw-bold small">Key Formulas:</p>
-          <code class="d-block bg-light p-2 rounded small text-dark mb-2">
+          <hr class="my-3">
+          <p class="mb-2 fw-bold small">Key Formulas:</p>
+          <code class="d-block bg-light p-2 rounded small text-dark mb-2 font-monospace">
             det(A<sup>-1</sup>) = 1 / det(A)
           </code>
-          <code class="d-block bg-light p-2 rounded small text-dark">
+          <code class="d-block bg-light p-2 rounded small text-dark font-monospace">
             A<sup>-1</sup> = (1 / det(A)) &middot; adj(A)
           </code>
         </div>
@@ -53,19 +53,19 @@
     </div>
 
     <div class="col-lg-4 col-md-6">
-      <div class="card h-100 shadow-sm border-0">
+      <div class="card h-100">
         <div class="card-body p-4">
-          <div class="badge bg-info text-dark mb-2">Geometry</div>
-          <h4>Vectors &amp; Dot/Cross Products</h4>
-          <p class="text-muted small">
+          <div class="badge bg-info text-dark mb-3 px-3 py-2">Geometry</div>
+          <h4 class="fw-bold mb-2">Vectors &amp; Dot/Cross Products</h4>
+          <p class="text-muted small leading-relaxed">
             Vectors represent quantities with magnitude and direction. Dot products measure alignment/projection, while cross products produce perpendicular vectors.
           </p>
-          <hr>
-          <p class="mb-1 fw-bold small">Key Formulas:</p>
-          <code class="d-block bg-light p-2 rounded small text-dark mb-2">
+          <hr class="my-3">
+          <p class="mb-2 fw-bold small">Key Formulas:</p>
+          <code class="d-block bg-light p-2 rounded small text-dark mb-2 font-monospace">
             u &middot; v = |u||v| cos(&theta;)
           </code>
-          <code class="d-block bg-light p-2 rounded small text-dark">
+          <code class="d-block bg-light p-2 rounded small text-dark font-monospace">
             |u &times; v| = |u||v| sin(&theta;)
           </code>
         </div>
@@ -73,16 +73,16 @@
     </div>
 
     <div class="col-lg-4 col-md-6">
-      <div class="card h-100 shadow-sm border-0">
+      <div class="card h-100">
         <div class="card-body p-4">
-          <div class="badge bg-warning text-dark mb-2">Algebra</div>
-          <h4>Linear Systems \(Ax = b\)</h4>
-          <p class="text-muted small">
+          <div class="badge bg-warning text-dark mb-3 px-3 py-2">Algebra</div>
+          <h4 class="fw-bold mb-2">Linear Systems \(Ax = b\)</h4>
+          <p class="text-muted small leading-relaxed">
             A linear system can have exactly one unique solution, infinitely many solutions, or no solution (inconsistent). Solved via Gaussian elimination to RREF.
           </p>
-          <hr>
+          <hr class="my-3">
           <p class="mb-1 fw-bold small">Rouché-Capelli Theorem:</p>
-          <span class="small text-secondary">
+          <span class="small text-muted">
             System is consistent if rank(A) = rank([A|b]). Unique if rank equals number of variables.
           </span>
         </div>
@@ -90,16 +90,16 @@
     </div>
 
     <div class="col-lg-4 col-md-6">
-      <div class="card h-100 shadow-sm border-0">
+      <div class="card h-100">
         <div class="card-body p-4">
-          <div class="badge bg-danger mb-2">Advanced</div>
-          <h4>Eigenvalues &amp; Eigenvectors</h4>
-          <p class="text-muted small">
+          <div class="badge bg-danger mb-3 px-3 py-2">Advanced</div>
+          <h4 class="fw-bold mb-2">Eigenvalues &amp; Eigenvectors</h4>
+          <p class="text-muted small leading-relaxed">
             Eigenvectors are non-zero vectors whose direction is unchanged by a transformation \(A\); they are scaled by eigenvalue \(\lambda\).
           </p>
-          <hr>
-          <p class="mb-1 fw-bold small">Characteristic Equation:</p>
-          <code class="d-block bg-light p-2 rounded small text-dark">
+          <hr class="my-3">
+          <p class="mb-2 fw-bold small">Characteristic Equation:</p>
+          <code class="d-block bg-light p-2 rounded small text-dark font-monospace">
             det(A - &lambda;I) = 0
           </code>
         </div>
@@ -107,16 +107,16 @@
     </div>
 
     <div class="col-lg-4 col-md-6">
-      <div class="card h-100 shadow-sm border-0">
+      <div class="card h-100">
         <div class="card-body p-4">
-          <div class="badge bg-secondary mb-2">Transformation</div>
-          <h4>Linear Transformations</h4>
-          <p class="text-muted small">
+          <div class="badge bg-secondary mb-3 px-3 py-2">Transformation</div>
+          <h4 class="fw-bold mb-2">Linear Transformations</h4>
+          <p class="text-muted small leading-relaxed">
             Functions between vector spaces that preserve vector addition and scalar multiplication: \(T(cu + v) = cT(u) + T(v)\).
           </p>
-          <hr>
+          <hr class="my-3">
           <p class="mb-1 fw-bold small">Common 2D Matrices:</p>
-          <span class="small text-secondary">
+          <span class="small text-muted font-monospace">
             Rotation: \(\begin{bmatrix}\cos\theta &amp; -\sin\theta \\ \sin\theta &amp; \cos\theta\end{bmatrix}\)
           </span>
         </div>

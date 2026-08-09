@@ -6,7 +6,7 @@
 <div class="calc-header">
   <div class="container">
     <h1>Eigenvalue &amp; Eigenvector Calculator</h1>
-    <p>Enter a square matrix to find its eigenvalues and eigenvectors.</p>
+    <p>Compute characteristic polynomials, eigenvalues (λ), and corresponding eigenvectors for square matrices.</p>
   </div>
 </div>
 
@@ -15,29 +15,35 @@
 
     <!-- Input -->
     <div class="col-lg-5">
-      <div class="card">
+      <div class="card h-100">
         <div class="card-body">
 
-          <div class="mb-3">
-            <label class="form-label" for="eigenN">Matrix size (n×n)</label>
-            <input type="number" id="eigenN" class="form-control" value="2" min="1" max="6" style="width:80px" onchange="buildEigenGrid()">
+          <div class="mb-4">
+            <label class="form-label fw-bold" for="eigenN">Matrix Dimension (n × n)</label>
+            <input type="number" id="eigenN" class="form-control form-control-lg text-center font-monospace shadow-sm" value="2" min="1" max="6" style="width:100px; border-radius: var(--radius-md);" onchange="buildEigenGrid()">
           </div>
 
-          <label class="form-label">Matrix A</label>
-          <div id="eigenGrid" class="matrix-grid mb-3"></div>
-
-          <!-- Quick fill buttons -->
-          <div class="mb-3">
-            <span class="text-muted small d-block mb-1">Quick fill:</span>
-            <div class="btn-group btn-group-sm flex-wrap gap-1">
-              <button class="btn btn-outline-secondary" onclick="fillRandomEigen()">🎲 Random Matrix</button>
-              <button class="btn btn-outline-secondary" onclick="fillIdentityEigen()">1️⃣ Identity</button>
-              <button class="btn btn-outline-secondary" onclick="fillZerosEigen()">0️⃣ Zeros</button>
+          <div class="mb-4">
+            <label class="form-label fw-bold d-block">Matrix A</label>
+            <div class="matrix-bracket-wrapper">
+              <div id="eigenGrid" class="matrix-grid"></div>
             </div>
           </div>
 
-          <button class="btn btn-primary" onclick="calcEigen()">Compute</button>
-          <button class="btn btn-outline-secondary ms-2" onclick="clearEigen()">Clear</button>
+          <!-- Quick fill buttons -->
+          <div class="mb-4">
+            <span class="text-muted small d-block mb-2 fw-semibold">Quick Presets:</span>
+            <div class="d-flex flex-wrap gap-2">
+              <button class="btn btn-outline-secondary btn-sm" onclick="fillRandomEigen()">🎲 Random Matrix</button>
+              <button class="btn btn-outline-secondary btn-sm" onclick="fillIdentityEigen()">1️⃣ Identity</button>
+              <button class="btn btn-outline-secondary btn-sm" onclick="fillZerosEigen()">0️⃣ Zeros</button>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 pt-2">
+            <button class="btn btn-primary px-4" onclick="calcEigen()">Compute</button>
+            <button class="btn btn-outline-secondary px-3" onclick="clearEigen()">Clear</button>
+          </div>
 
         </div>
       </div>
@@ -46,16 +52,18 @@
     <!-- Result -->
     <div class="col-lg-7">
       <div class="result-header">
-        <h5 class="mb-0">Eigenvalues &amp; Eigenvectors</h5>
+        <h5 class="mb-0 fw-bold">Eigenvalues &amp; Eigenvectors</h5>
         <div id="exportEigenBtnGroup" style="display:none" class="d-flex gap-2">
-          <button id="exportEigenTxtBtn" class="btn btn-outline-success btn-sm export-btn" onclick="exportEigenTxt()">📥 Export TXT</button>
-          <button id="exportEigenPdfBtn" class="btn btn-outline-danger btn-sm export-btn" onclick="exportEigenPdf()">📄 Export PDF</button>
+          <button id="exportEigenTxtBtn" class="btn btn-outline-secondary btn-sm export-btn" onclick="exportEigenTxt()">📥 Export TXT</button>
+          <button id="exportEigenPdfBtn" class="btn btn-outline-secondary btn-sm export-btn" onclick="exportEigenPdf()">📄 Export PDF</button>
         </div>
       </div>
+      
       <div class="result-panel" id="eigenResultPanel">
-        <span class="text-muted">Results will appear here.</span>
+        <span class="text-muted">Fill matrix values and click <strong>Compute</strong>.</span>
       </div>
-      <div id="eigenStepsBox" class="steps-box mt-2" style="display:none"></div>
+      
+      <div id="eigenStepsBox" class="steps-box" style="display:none"></div>
     </div>
 
   </div>
@@ -68,7 +76,7 @@
 function buildEigenGrid() {
   const n = parseInt(document.getElementById("eigenN").value) || 2;
   const div = document.getElementById("eigenGrid");
-  div.style.gridTemplateColumns = `repeat(${n}, 60px)`;
+  div.style.gridTemplateColumns = `repeat(${n}, 64px)`;
   div.innerHTML = "";
   for (let r = 0; r < n; r++) {
     for (let c = 0; c < n; c++) {
@@ -129,7 +137,7 @@ function clearEigen() {
   document.querySelectorAll("input[type=number][id^='eigen_']").forEach(el => el.value = "0");
   const panel = document.getElementById("eigenResultPanel");
   panel.className = "result-panel";
-  panel.innerHTML = '<span class="text-muted">Results will appear here.</span>';
+  panel.innerHTML = '<span class="text-muted">Fill matrix values and click <strong>Compute</strong>.</span>';
   document.getElementById("eigenStepsBox").style.display = "none";
   const btnGroup = document.getElementById("exportEigenBtnGroup");
   if (btnGroup) btnGroup.style.display = "none";
@@ -140,15 +148,19 @@ async function calcEigen() {
   const n = parseInt(document.getElementById("eigenN").value) || 2;
   const matrix = readEigenMatrix(n);
 
-  const res = await fetch("/api/eigen", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ matrix })
-  });
-  const data = await res.json();
-  lastEigenCalc = { matrix, data };
+  try {
+    const res = await fetch("/api/eigen", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ matrix })
+    });
+    const data = await res.json();
+    lastEigenCalc = { matrix, data };
 
-  showEigenResult(data);
+    showEigenResult(data);
+  } catch (err) {
+    showEigenResult({ error: "Failed to connect to calculation service." });
+  }
 }
 
 function showEigenResult(data) {
@@ -167,19 +179,19 @@ function showEigenResult(data) {
   if (exportBtnGroup) exportBtnGroup.style.display = "flex";
   panel.className = "result-panel success";
 
-  let html = "<strong>Eigenvalues (&lambda;):</strong><ul class='mt-1 mb-2'>";
+  let html = "<div class='mb-3'><strong class='d-block mb-2 text-muted uppercase small fw-bold'>Eigenvalues (λ):</strong><ul class='list-unstyled mb-0 d-flex flex-wrap gap-2'>";
   data.eigenvalues.forEach((v, i) => {
-    html += `<li>&lambda;<sub>${i+1}</sub> = <strong>${v}</strong></li>`;
+    html += `<li class='badge bg-light text-dark border px-3 py-2 fs-6 font-monospace'>λ<sub>${i+1}</sub> = <span class='text-primary fw-bold'>${v}</span></li>`;
   });
-  html += "</ul>";
-  html += "<hr class='my-2'>";
+  html += "</ul></div>";
+  html += "<hr class='my-3'>";
 
   // Eigenvectors
-  html += "<strong>Eigenvectors:</strong><ul class='mt-2 mb-0'>";
+  html += "<div><strong class='d-block mb-2 text-muted uppercase small fw-bold'>Eigenvectors (v):</strong><ul class='list-unstyled mb-0 d-flex flex-column gap-2'>";
   data.eigenvectors.forEach((vec, i) => {
-    html += `<li>v<sub>${i+1}</sub> = [ ${vec.join(", ")} ]</li>`;
+    html += `<li class='d-flex align-items-center gap-2 font-monospace fs-6'><span class='text-muted'>v<sub>${i+1}</sub> =</span> <div class='matrix-bracket-wrapper'>[ ${vec.join(", ")} ]</div></li>`;
   });
-  html += "</ul>";
+  html += "</ul></div>";
 
   panel.innerHTML = html;
 

@@ -6,7 +6,7 @@
 <div class="calc-header">
   <div class="container">
     <h1>Linear Transformation Calculator</h1>
-    <p>Build a transformation matrix and optionally apply it to a vector.</p>
+    <p>Construct 2D &amp; 3D linear transformation matrices and map vectors through geometric spaces.</p>
   </div>
 </div>
 
@@ -15,13 +15,13 @@
 
     <!-- LEFT: Controls -->
     <div class="col-lg-5">
-      <div class="card">
+      <div class="card h-100">
         <div class="card-body">
 
-          <div class="mb-3">
-            <label class="form-label" for="tType">Transformation Type</label>
-            <select class="form-select" id="tType" onchange="updateTransformUI()">
-              <optgroup label="2D Transforms">
+          <div class="mb-4">
+            <label class="form-label fw-bold" for="tType">Transformation Type</label>
+            <select class="form-select form-select-lg shadow-sm" id="tType" onchange="updateTransformUI()" style="font-size: 0.95rem; border-radius: var(--radius-md);">
+              <optgroup label="2D Geometric Transforms">
                 <option value="rotation_2d">2D Rotation</option>
                 <option value="scale">Scaling</option>
                 <option value="shear_x">Horizontal Shear</option>
@@ -32,86 +32,92 @@
                 <option value="project_x">Project onto X-axis</option>
                 <option value="project_y">Project onto Y-axis</option>
               </optgroup>
-              <optgroup label="3D Transforms">
+              <optgroup label="3D Geometric Transforms">
                 <option value="rotation_3d_x">3D Rotation — X axis</option>
                 <option value="rotation_3d_y">3D Rotation — Y axis</option>
                 <option value="rotation_3d_z">3D Rotation — Z axis</option>
               </optgroup>
-              <optgroup label="Custom">
-                <option value="custom">Custom Matrix</option>
+              <optgroup label="Custom Matrix">
+                <option value="custom">Custom Matrix T</option>
               </optgroup>
             </select>
           </div>
 
           <!-- Angle param -->
-          <div id="angleParam" class="mb-3">
-            <label class="form-label" for="angleDeg">Angle (degrees)</label>
-            <input type="number" id="angleDeg" class="form-control" value="45" style="width:120px">
+          <div id="angleParam" class="mb-4">
+            <label class="form-label fw-bold" for="angleDeg">Angle θ (Degrees)</label>
+            <input type="number" id="angleDeg" class="form-control font-monospace shadow-sm" value="45" style="width:130px; border-radius: var(--radius-sm);">
           </div>
 
           <!-- Scale params -->
-          <div id="scaleParam" class="mb-3" style="display:none">
+          <div id="scaleParam" class="mb-4" style="display:none">
             <div class="row g-2">
               <div class="col-auto">
-                <label class="form-label" for="scaleX">sx</label>
-                <input type="number" id="scaleX" class="form-control" value="2" style="width:80px" step="0.1">
+                <label class="form-label small fw-bold mb-1" for="scaleX">s<sub>x</sub></label>
+                <input type="number" id="scaleX" class="form-control font-monospace shadow-sm text-center" value="2" style="width:80px; border-radius: var(--radius-sm);" step="0.1">
               </div>
               <div class="col-auto">
-                <label class="form-label" for="scaleY">sy</label>
-                <input type="number" id="scaleY" class="form-control" value="2" style="width:80px" step="0.1">
+                <label class="form-label small fw-bold mb-1" for="scaleY">s<sub>y</sub></label>
+                <input type="number" id="scaleY" class="form-control font-monospace shadow-sm text-center" value="2" style="width:80px; border-radius: var(--radius-sm);" step="0.1">
               </div>
               <div class="col-auto" id="scaleZWrapper" style="display:none">
-                <label class="form-label" for="scaleZ">sz</label>
-                <input type="number" id="scaleZ" class="form-control" value="1" style="width:80px" step="0.1">
+                <label class="form-label small fw-bold mb-1" for="scaleZ">s<sub>z</sub></label>
+                <input type="number" id="scaleZ" class="form-control font-monospace shadow-sm text-center" value="1" style="width:80px; border-radius: var(--radius-sm);" step="0.1">
               </div>
             </div>
           </div>
 
           <!-- Shear param -->
-          <div id="shearParam" class="mb-3" style="display:none">
-            <label class="form-label" for="shearK">Shear factor (k)</label>
-            <input type="number" id="shearK" class="form-control" value="1" style="width:120px" step="0.1">
+          <div id="shearParam" class="mb-4" style="display:none">
+            <label class="form-label fw-bold" for="shearK">Shear Factor (k)</label>
+            <input type="number" id="shearK" class="form-control font-monospace shadow-sm" value="1" style="width:130px; border-radius: var(--radius-sm);" step="0.1">
           </div>
 
           <!-- Custom matrix -->
-          <div id="customParam" class="mb-3" style="display:none">
-            <div class="row g-2 mb-2">
+          <div id="customParam" class="mb-4" style="display:none">
+            <div class="row g-2 mb-3">
               <div class="col-auto">
-                <label class="form-label" for="customRows">Rows</label>
-                <input type="number" id="customRows" class="form-control" value="2" min="1" max="5" style="width:70px" onchange="buildCustomGrid()">
+                <label class="form-label small fw-bold mb-1" for="customRows">Rows</label>
+                <input type="number" id="customRows" class="form-control text-center font-monospace shadow-sm" value="2" min="1" max="5" style="width:72px; border-radius: var(--radius-sm);" onchange="buildCustomGrid()">
               </div>
               <div class="col-auto">
-                <label class="form-label" for="customCols">Cols</label>
-                <input type="number" id="customCols" class="form-control" value="2" min="1" max="5" style="width:70px" onchange="buildCustomGrid()">
+                <label class="form-label small fw-bold mb-1" for="customCols">Cols</label>
+                <input type="number" id="customCols" class="form-control text-center font-monospace shadow-sm" value="2" min="1" max="5" style="width:72px; border-radius: var(--radius-sm);" onchange="buildCustomGrid()">
               </div>
             </div>
-            <label class="form-label">Custom Matrix T</label>
-            <div id="customGrid" class="matrix-grid mb-2"></div>
+            <label class="form-label fw-bold d-block">Custom Matrix T</label>
+            <div class="matrix-bracket-wrapper">
+              <div id="customGrid" class="matrix-grid"></div>
+            </div>
           </div>
 
-          <!-- Vector input -->
-          <div class="section-divider"></div>
-          <div class="form-check mb-2">
+          <!-- Vector input checkbox -->
+          <div class="section-divider my-4"></div>
+          <div class="form-check mb-3">
             <input class="form-check-input" type="checkbox" id="applyVector" onchange="updateVectorSection()">
-            <label class="form-check-label" for="applyVector">Apply transform to a vector</label>
+            <label class="form-check-label fw-semibold" for="applyVector">Apply transformation to a vector</label>
           </div>
 
-          <div id="vectorSection" style="display:none" class="mb-3">
-            <label class="form-label">Input vector</label>
-            <div class="vector-input" id="transformVecInputs"></div>
+          <div id="vectorSection" style="display:none" class="mb-4">
+            <label class="form-label fw-bold d-block">Input Vector v</label>
+            <div class="matrix-bracket-wrapper">
+              <div class="vector-input mb-0" id="transformVecInputs"></div>
+            </div>
           </div>
 
           <!-- Quick fill buttons -->
-          <div class="mb-3">
-            <span class="text-muted small d-block mb-1">Quick fill:</span>
-            <div class="btn-group btn-group-sm flex-wrap gap-1">
-              <button class="btn btn-outline-secondary" onclick="fillRandomTransformVec()">🎲 Random Vector</button>
-              <button id="btnRandomCustomMat" class="btn btn-outline-secondary" style="display:none" onclick="fillRandomCustomMat()">🎲 Random Custom Matrix</button>
+          <div class="mb-4">
+            <span class="text-muted small d-block mb-2 fw-semibold">Quick Presets:</span>
+            <div class="d-flex flex-wrap gap-2">
+              <button class="btn btn-outline-secondary btn-sm" onclick="fillRandomTransformVec()">🎲 Random Vector</button>
+              <button id="btnRandomCustomMat" class="btn btn-outline-secondary btn-sm" style="display:none" onclick="fillRandomCustomMat()">🎲 Random Custom Matrix</button>
             </div>
           </div>
 
-          <button class="btn btn-primary" onclick="calcTransform()">Compute</button>
-          <button class="btn btn-outline-secondary ms-2" onclick="clearTransform()">Clear</button>
+          <div class="d-flex gap-2 pt-2">
+            <button class="btn btn-primary px-4" onclick="calcTransform()">Compute Matrix</button>
+            <button class="btn btn-outline-secondary px-3" onclick="clearTransform()">Clear</button>
+          </div>
 
         </div>
       </div>
@@ -120,30 +126,32 @@
     <!-- RIGHT: Results -->
     <div class="col-lg-7">
       <div class="result-header">
-        <h5 class="mb-0">Transformation Matrix</h5>
+        <h5 class="mb-0 fw-bold">Transformation Matrix T</h5>
         <div id="exportTransformBtnGroup" style="display:none" class="d-flex gap-2">
-          <button id="exportTransformTxtBtn" class="btn btn-outline-success btn-sm export-btn" onclick="exportTransformTxt()">📥 Export TXT</button>
-          <button id="exportTransformPdfBtn" class="btn btn-outline-danger btn-sm export-btn" onclick="exportTransformPdf()">📄 Export PDF</button>
+          <button id="exportTransformTxtBtn" class="btn btn-outline-secondary btn-sm export-btn" onclick="exportTransformTxt()">📥 Export TXT</button>
+          <button id="exportTransformPdfBtn" class="btn btn-outline-secondary btn-sm export-btn" onclick="exportTransformPdf()">📄 Export PDF</button>
         </div>
       </div>
+      
       <div class="result-panel" id="tResultPanel">
-        <span class="text-muted">Result will appear here.</span>
+        <span class="text-muted">Select options and click <strong>Compute Matrix</strong>.</span>
       </div>
-      <div id="tStepsBox" class="steps-box mt-2" style="display:none"></div>
+      
+      <div id="tStepsBox" class="steps-box" style="display:none"></div>
 
       <!-- Vector result -->
       <div id="tVectorResult" style="display:none" class="mt-4">
-        <div class="section-divider"></div>
-        <h6>Applied to Vector</h6>
-        <div class="row g-3">
-          <div class="col-auto">
-            <strong>Input:</strong>
-            <div id="tvIn" class="mt-1" style="font-family:monospace; font-size:1rem;"></div>
+        <div class="section-divider mb-3"></div>
+        <h6 class="fw-bold mb-3">Mapped Output Vector T(v)</h6>
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+          <div>
+            <span class="small text-muted d-block mb-1">Input v:</span>
+            <div id="tvIn" class="matrix-bracket-wrapper font-monospace fs-6"></div>
           </div>
-          <div class="col-auto align-self-center" style="font-size:1.4rem; color:#6c757d;">→</div>
-          <div class="col-auto">
-            <strong>Output:</strong>
-            <div id="tvOut" class="mt-1" style="font-family:monospace; font-size:1rem; color:#198754;"></div>
+          <div class="fs-4 text-muted">→</div>
+          <div>
+            <span class="small text-muted d-block mb-1">Transformed T(v):</span>
+            <div id="tvOut" class="matrix-bracket-wrapper font-monospace fs-6 text-primary fw-bold"></div>
           </div>
         </div>
       </div>
@@ -151,18 +159,18 @@
       <!-- Reference table -->
       <div class="card mt-4">
         <div class="card-body">
-          <h6 class="card-title">Common 2D Transforms Reference</h6>
+          <h6 class="card-title fw-bold mb-3">Standard 2D Transformation Matrices</h6>
           <div class="table-responsive">
-            <table class="table table-sm table-bordered small mb-0">
+            <table class="table table-sm table-bordered small mb-0 align-middle">
               <thead class="table-light">
-                <tr><th>Transform</th><th>Matrix</th><th>Effect</th></tr>
+                <tr><th>Transformation</th><th>Matrix Definition</th><th>Geometric Effect</th></tr>
               </thead>
               <tbody>
-                <tr><td>Rotation θ</td><td>[cosθ, −sinθ; sinθ, cosθ]</td><td>Rotate CCW by θ</td></tr>
-                <tr><td>Scale</td><td>[sx, 0; 0, sy]</td><td>Stretch/compress</td></tr>
-                <tr><td>Shear X</td><td>[1, k; 0, 1]</td><td>Slant horizontally</td></tr>
-                <tr><td>Reflect X</td><td>[1, 0; 0, −1]</td><td>Flip over x-axis</td></tr>
-                <tr><td>Reflect Y</td><td>[−1, 0; 0, 1]</td><td>Flip over y-axis</td></tr>
+                <tr><td class="fw-semibold">Rotation θ</td><td class="font-monospace">[cosθ, −sinθ; sinθ, cosθ]</td><td>Rotates CCW by angle θ</td></tr>
+                <tr><td class="fw-semibold">Scaling</td><td class="font-monospace">[sx, 0; 0, sy]</td><td>Stretches or shrinks axes</td></tr>
+                <tr><td class="fw-semibold">Shear X</td><td class="font-monospace">[1, k; 0, 1]</td><td>Slants grid horizontally</td></tr>
+                <tr><td class="fw-semibold">Reflect X</td><td class="font-monospace">[1, 0; 0, −1]</td><td>Flips across x-axis</td></tr>
+                <tr><td class="fw-semibold">Reflect Y</td><td class="font-monospace">[−1, 0; 0, 1]</td><td>Flips across y-axis</td></tr>
               </tbody>
             </table>
           </div>
@@ -248,7 +256,7 @@ function buildCustomGrid() {
   const rows = parseInt(document.getElementById("customRows").value) || 2;
   const cols = parseInt(document.getElementById("customCols").value) || 2;
   const div = document.getElementById("customGrid");
-  div.style.gridTemplateColumns = `repeat(${cols}, 60px)`;
+  div.style.gridTemplateColumns = `repeat(${cols}, 64px)`;
   div.innerHTML = "";
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
@@ -266,10 +274,11 @@ let lastTransformCalc = null;
 function clearTransform() {
   const panel = document.getElementById("tResultPanel");
   panel.className = "result-panel";
-  panel.innerHTML = '<span class="text-muted">Result will appear here.</span>';
+  panel.innerHTML = '<span class="text-muted">Select options and click <strong>Compute Matrix</strong>.</span>';
   document.getElementById("tStepsBox").style.display = "none";
   document.getElementById("tVectorResult").style.display = "none";
-  document.getElementById("exportTransformTxtBtn").style.display = "none";
+  const btnGroup = document.getElementById("exportTransformBtnGroup");
+  if (btnGroup) btnGroup.style.display = "none";
   lastTransformCalc = null;
 }
 
@@ -313,14 +322,18 @@ async function calcTransform() {
     payload.vector = Array.from(inputs).map(el => parseFloat(el.value) || 0);
   }
 
-  const res = await fetch("/api/transform", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify(payload)
-  });
-  const data = await res.json();
-  lastTransformCalc = { t, payload, data };
-  showTransformResult(data);
+  try {
+    const res = await fetch("/api/transform", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    lastTransformCalc = { t, payload, data };
+    showTransformResult(data);
+  } catch (err) {
+    showTransformResult({ error: "Failed to connect to calculation service." });
+  }
 }
 
 function showTransformResult(data) {
@@ -342,14 +355,14 @@ function showTransformResult(data) {
   panel.className = "result-panel success";
 
   // Show matrix
-  let html = '<table class="result-matrix"><tbody>';
+  let html = '<div class="matrix-bracket-wrapper"><table class="result-matrix"><tbody>';
   data.transform_matrix.forEach(row => {
     html += "<tr>" + row.map(v => {
       const s = typeof v === "number" ? +v.toFixed(4) : v;
       return `<td>${s}</td>`;
     }).join("") + "</tr>";
   });
-  html += "</tbody></table>";
+  html += "</tbody></table></div>";
   panel.innerHTML = html;
 
   if (data.steps) {

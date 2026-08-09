@@ -6,7 +6,7 @@
 <div class="calc-header">
   <div class="container">
     <h1>Systems of Equations Solver</h1>
-    <p>Solve system Ax = b step-by-step using Gaussian elimination.</p>
+    <p>Solve linear systems Ax = b step-by-step using Gaussian elimination and RREF row reduction.</p>
   </div>
 </div>
 
@@ -15,36 +15,38 @@
 
     <!-- LEFT: Input panel -->
     <div class="col-lg-7">
-      <div class="card">
+      <div class="card h-100">
         <div class="card-body">
 
-          <div class="row g-2 mb-3">
+          <div class="row g-3 mb-4 align-items-center">
             <div class="col-auto">
-              <label class="form-label" for="sysN">Number of variables (n)</label>
-              <input type="number" id="sysN" class="form-control" value="2" min="1" max="6" style="width:80px" onchange="buildSystem()">
+              <label class="form-label fw-bold mb-1" for="sysN">Number of Variables (n)</label>
+              <input type="number" id="sysN" class="form-control text-center font-monospace shadow-sm" value="2" min="1" max="6" style="width:90px; border-radius: var(--radius-sm);" onchange="buildSystem()">
             </div>
             <div class="col-auto align-self-end">
-              <span class="text-muted small">(square system n×n)</span>
+              <span class="text-muted small">(Square system n × n)</span>
             </div>
           </div>
 
-          <div class="table-responsive mb-3">
-            <table class="system-table" id="systemTable">
+          <div class="table-responsive mb-4">
+            <table class="system-table w-100" id="systemTable">
               <!-- built by JS -->
             </table>
           </div>
 
           <!-- Quick fill buttons -->
-          <div class="mb-3">
-            <span class="text-muted small d-block mb-1">Quick fill:</span>
-            <div class="btn-group btn-group-sm flex-wrap gap-1">
-              <button class="btn btn-outline-secondary" onclick="fillRandomSystem()">🎲 Random System</button>
-              <button class="btn btn-outline-secondary" onclick="fillZerosSystem()">0️⃣ Zeros</button>
+          <div class="mb-4">
+            <span class="text-muted small d-block mb-2 fw-semibold">Quick Presets:</span>
+            <div class="d-flex flex-wrap gap-2">
+              <button class="btn btn-outline-secondary btn-sm" onclick="fillRandomSystem()">🎲 Random System</button>
+              <button class="btn btn-outline-secondary btn-sm" onclick="fillZerosSystem()">0️⃣ Zeros</button>
             </div>
           </div>
 
-          <button class="btn btn-primary" onclick="calcSystem()">Solve</button>
-          <button class="btn btn-outline-secondary ms-2" onclick="clearSystem()">Clear</button>
+          <div class="d-flex gap-2 pt-2">
+            <button class="btn btn-primary px-4" onclick="calcSystem()">Solve System</button>
+            <button class="btn btn-outline-secondary px-3" onclick="clearSystem()">Clear</button>
+          </div>
 
         </div>
       </div>
@@ -53,16 +55,18 @@
     <!-- RIGHT: Result -->
     <div class="col-lg-5">
       <div class="result-header">
-        <h5 class="mb-0">Solution x</h5>
+        <h5 class="mb-0 fw-bold">Solution Vector x</h5>
         <div id="exportSysBtnGroup" style="display:none" class="d-flex gap-2">
-          <button id="exportSysTxtBtn" class="btn btn-outline-success btn-sm export-btn" onclick="exportSystemTxt()">📥 Export TXT</button>
-          <button id="exportSysPdfBtn" class="btn btn-outline-danger btn-sm export-btn" onclick="exportSystemPdf()">📄 Export PDF</button>
+          <button id="exportSysTxtBtn" class="btn btn-outline-secondary btn-sm export-btn" onclick="exportSystemTxt()">📥 Export TXT</button>
+          <button id="exportSysPdfBtn" class="btn btn-outline-secondary btn-sm export-btn" onclick="exportSystemPdf()">📄 Export PDF</button>
         </div>
       </div>
+      
       <div class="result-panel" id="sysResultPanel">
-        <span class="text-muted">Solution will appear here.</span>
+        <span class="text-muted">Fill equation coefficients and click <strong>Solve System</strong>.</span>
       </div>
-      <div id="sysStepsBox" class="steps-box mt-2" style="display:none"></div>
+      
+      <div id="sysStepsBox" class="steps-box" style="display:none"></div>
     </div>
 
   </div>
@@ -77,13 +81,18 @@ function buildSystem() {
   const table = document.getElementById("systemTable");
   let html = "<tbody>";
   for (let r = 0; r < n; r++) {
-    html += "<tr>";
+    html += "<tr class='align-middle'>";
     for (let c = 0; c < n; c++) {
-      const plus = c < n - 1 ? " + " : "";
-      html += `<td><input type="number" id="sys_a_${r}_${c}" value="${r === c ? 1 : 0}"> x<sub>${c+1}</sub>${plus}</td>`;
+      const plus = c < n - 1 ? " <span class='text-muted mx-1'>+</span> " : "";
+      html += `<td>
+        <div class='d-inline-flex align-items-center gap-1'>
+          <input type="number" class="form-control text-center font-monospace shadow-sm" id="sys_a_${r}_${c}" value="${r === c ? 1 : 0}" style="width:64px; border-radius: var(--radius-sm);">
+          <span class='font-monospace text-primary fw-bold'>x<sub>${c+1}</sub></span>${plus}
+        </div>
+      </td>`;
     }
-    html += `<td class="eq-sign">=</td>`;
-    html += `<td><input type="number" id="sys_b_${r}" value="1"></td>`;
+    html += `<td class="eq-sign font-monospace fw-bold text-muted px-2">=</td>`;
+    html += `<td><input type="number" class="form-control text-center font-monospace shadow-sm" id="sys_b_${r}" value="1" style="width:64px; border-radius: var(--radius-sm);"></td>`;
     html += "</tr>";
   }
   html += "</tbody>";
@@ -133,7 +142,7 @@ function clearSystem() {
   document.querySelectorAll("input[type=number][id^='sys_']").forEach(el => el.value = "0");
   const panel = document.getElementById("sysResultPanel");
   panel.className = "result-panel";
-  panel.innerHTML = '<span class="text-muted">Solution will appear here.</span>';
+  panel.innerHTML = '<span class="text-muted">Fill equation coefficients and click <strong>Solve System</strong>.</span>';
   document.getElementById("sysStepsBox").style.display = "none";
   const btnGroup = document.getElementById("exportSysBtnGroup");
   if (btnGroup) btnGroup.style.display = "none";
@@ -144,15 +153,19 @@ async function calcSystem() {
   const n = parseInt(document.getElementById("sysN").value) || 2;
   const { A, b } = readSystem(n);
 
-  const res = await fetch("/api/systems", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ matrix_a: A, vector_b: b })
-  });
-  const data = await res.json();
-  lastSysCalc = { A, b, data };
+  try {
+    const res = await fetch("/api/systems", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ matrix_a: A, vector_b: b })
+    });
+    const data = await res.json();
+    lastSysCalc = { A, b, data };
 
-  showSysResult(data, n);
+    showSysResult(data, n);
+  } catch (err) {
+    showSysResult({ error: "Failed to connect to calculation service." }, n);
+  }
 }
 
 function showSysResult(data, n) {
@@ -171,9 +184,9 @@ function showSysResult(data, n) {
   if (exportBtnGroup) exportBtnGroup.style.display = "flex";
   panel.className = "result-panel success";
 
-  let html = "<ul class='mb-0'>";
+  let html = "<ul class='mb-0 list-unstyled d-flex flex-column gap-2'>";
   data.result.forEach((v, i) => {
-    html += `<li><strong>x<sub>${i+1}</sub> = ${v}</strong></li>`;
+    html += `<li class='d-flex align-items-center gap-2 fs-5 font-monospace'><span class='text-muted'>x<sub>${i+1}</sub> =</span> <strong class='text-primary'>${v}</strong></li>`;
   });
   html += "</ul>";
   panel.innerHTML = html;

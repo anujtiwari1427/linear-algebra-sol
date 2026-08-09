@@ -6,7 +6,7 @@
 <div class="calc-header">
   <div class="container">
     <h1>Vector Calculator</h1>
-    <p>Compute dot product, cross product, angle, projection, and more.</p>
+    <p>Compute dot products, cross products, magnitudes, unit vectors, angles, and projections in 2D, 3D, and 4D.</p>
   </div>
 </div>
 
@@ -15,18 +15,18 @@
 
     <!-- Input panel -->
     <div class="col-lg-6">
-      <div class="card">
+      <div class="card h-100">
         <div class="card-body">
 
-          <div class="mb-3">
-            <label class="form-label" for="vecOp">Operation</label>
-            <select class="form-select" id="vecOp" onchange="updateVecUI()">
-              <optgroup label="Single Vector">
+          <div class="mb-4">
+            <label class="form-label fw-bold" for="vecOp">Select Operation</label>
+            <select class="form-select form-select-lg shadow-sm" id="vecOp" onchange="updateVecUI()" style="font-size: 0.95rem; border-radius: var(--radius-md);">
+              <optgroup label="Single Vector Operations">
                 <option value="magnitude">Magnitude |a|</option>
-                <option value="normalize">Normalize (unit vector)</option>
-                <option value="scalar_multiply">Scalar Multiply (s × a)</option>
+                <option value="normalize">Normalize (Unit Vector)</option>
+                <option value="scalar_multiply">Scalar Multiplication (s × a)</option>
               </optgroup>
-              <optgroup label="Two Vectors">
+              <optgroup label="Two Vector Operations">
                 <option value="add">Add (a + b)</option>
                 <option value="subtract">Subtract (a − b)</option>
                 <option value="dot">Dot Product (a · b)</option>
@@ -37,10 +37,10 @@
             </select>
           </div>
 
-          <div class="row g-2 mb-3">
+          <div class="row g-3 mb-4 align-items-center">
             <div class="col-auto">
-              <label class="form-label" for="vecSize">Dimensions</label>
-              <select class="form-select" id="vecSize" style="width:100px" onchange="buildVectorInputs()">
+              <label class="form-label small fw-bold mb-1" for="vecSize">Dimensions</label>
+              <select class="form-select font-monospace shadow-sm" id="vecSize" style="width:110px; border-radius: var(--radius-sm);" onchange="buildVectorInputs()">
                 <option value="2">2D</option>
                 <option value="3" selected>3D</option>
                 <option value="4">4D</option>
@@ -49,34 +49,41 @@
           </div>
 
           <!-- Vector A -->
-          <label class="form-label">Vector a</label>
-          <div class="vector-input mb-3" id="vecAInputs"></div>
-
-          <!-- Vector B -->
-          <div id="vecBSection">
-            <label class="form-label">Vector b</label>
-            <div class="vector-input mb-3" id="vecBInputs"></div>
-          </div>
-
-          <!-- Scalar -->
-          <div id="scalarSection" style="display:none">
-            <label class="form-label" for="scalarVal">Scalar value</label>
-            <input type="number" class="form-control mb-3" id="scalarVal" value="2" style="width:120px">
-          </div>
-
-          <!-- Quick fill buttons -->
-          <div class="mb-3">
-            <span class="text-muted small d-block mb-1">Quick fill:</span>
-            <div class="btn-group btn-group-sm flex-wrap gap-1">
-              <button class="btn btn-outline-secondary" onclick="fillRandomVecA()">🎲 Random a</button>
-              <button id="btnRandomVecB" class="btn btn-outline-secondary" onclick="fillRandomVecB()">🎲 Random b</button>
-              <button class="btn btn-outline-secondary" onclick="fillZerosVec()">0️⃣ Zeros</button>
+          <div class="mb-4">
+            <label class="form-label fw-bold d-block">Vector a</label>
+            <div class="matrix-bracket-wrapper">
+              <div class="vector-input mb-0" id="vecAInputs"></div>
             </div>
           </div>
 
-          <button class="btn btn-primary" onclick="calcVector()">Calculate</button>
-          <button class="btn btn-outline-secondary ms-2" onclick="clearVec()">Clear</button>
+          <!-- Vector B -->
+          <div id="vecBSection" class="mb-4">
+            <label class="form-label fw-bold d-block">Vector b</label>
+            <div class="matrix-bracket-wrapper">
+              <div class="vector-input mb-0" id="vecBInputs"></div>
+            </div>
+          </div>
 
+          <!-- Scalar -->
+          <div id="scalarSection" class="mb-4" style="display:none">
+            <label class="form-label fw-bold" for="scalarVal">Scalar (s)</label>
+            <input type="number" class="form-control font-monospace shadow-sm" id="scalarVal" value="2" style="width:130px; border-radius: var(--radius-sm);">
+          </div>
+
+          <!-- Quick fill buttons -->
+          <div class="mb-4">
+            <span class="text-muted small d-block mb-2 fw-semibold">Quick Presets:</span>
+            <div class="d-flex flex-wrap gap-2">
+              <button class="btn btn-outline-secondary btn-sm" onclick="fillRandomVecA()">🎲 Random a</button>
+              <button id="btnRandomVecB" class="btn btn-outline-secondary btn-sm" onclick="fillRandomVecB()">🎲 Random b</button>
+              <button class="btn btn-outline-secondary btn-sm" onclick="fillZerosVec()">0️⃣ Zeros</button>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 pt-2">
+            <button class="btn btn-primary px-4" onclick="calcVector()">Calculate</button>
+            <button class="btn btn-outline-secondary px-3" onclick="clearVec()">Clear</button>
+          </div>
 
         </div>
       </div>
@@ -85,16 +92,18 @@
     <!-- Result -->
     <div class="col-lg-6">
       <div class="result-header">
-        <h5 class="mb-0">Result</h5>
+        <h5 class="mb-0 fw-bold">Output Solution</h5>
         <div id="exportVecBtnGroup" style="display:none" class="d-flex gap-2">
-          <button id="exportVecTxtBtn" class="btn btn-outline-success btn-sm export-btn" onclick="exportVectorTxt()">📥 Export TXT</button>
-          <button id="exportVecPdfBtn" class="btn btn-outline-danger btn-sm export-btn" onclick="exportVectorPdf()">📄 Export PDF</button>
+          <button id="exportVecTxtBtn" class="btn btn-outline-secondary btn-sm export-btn" onclick="exportVectorTxt()">📥 Export TXT</button>
+          <button id="exportVecPdfBtn" class="btn btn-outline-secondary btn-sm export-btn" onclick="exportVectorPdf()">📄 Export PDF</button>
         </div>
       </div>
+      
       <div class="result-panel" id="vecResultPanel">
-        <span class="text-muted">Result will appear here.</span>
+        <span class="text-muted">Fill vector components and click <strong>Calculate</strong> to compute.</span>
       </div>
-      <div id="vecStepsBox" class="steps-box mt-2" style="display:none"></div>
+      
+      <div id="vecStepsBox" class="steps-box" style="display:none"></div>
     </div>
 
   </div>
@@ -142,11 +151,10 @@ function fillZerosVec() {
   }
 }
 
-
 function buildVectorInputs() {
   const n = parseInt(document.getElementById("vecSize").value) || 3;
-  buildVec("vecAInputs", n, "a");
-  buildVec("vecBInputs", n, "b");
+  buildVec("vecAInputs", n, "a_");
+  buildVec("vecBInputs", n, "b_");
 }
 
 function buildVec(divId, n, prefix) {
@@ -171,33 +179,38 @@ function clearVec() {
   document.querySelectorAll("#vecAInputs input, #vecBInputs input").forEach(el => el.value = "0");
   const panel = document.getElementById("vecResultPanel");
   panel.className = "result-panel";
-  panel.innerHTML = '<span class="text-muted">Result will appear here.</span>';
+  panel.innerHTML = '<span class="text-muted">Fill vector components and click <strong>Calculate</strong> to compute.</span>';
   document.getElementById("vecStepsBox").style.display = "none";
-  document.getElementById("exportVecTxtBtn").style.display = "none";
+  const btnGroup = document.getElementById("exportVecBtnGroup");
+  if (btnGroup) btnGroup.style.display = "none";
   lastVecCalc = null;
 }
 
 async function calcVector() {
   const op = document.getElementById("vecOp").value;
   const n = parseInt(document.getElementById("vecSize").value) || 3;
-  const vecA = readVec(n, "a");
+  const vecA = readVec(n, "a_");
   let payload = { operation: op, vec_a: vecA };
 
   if (!singleVecOps.includes(op)) {
-    payload.vec_b = readVec(n, "b");
+    payload.vec_b = readVec(n, "b_");
   }
   if (op === "scalar_multiply") {
     payload.scalar = parseFloat(document.getElementById("scalarVal").value) || 1;
   }
 
-  const res = await fetch("/api/vectors", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
-  const data = await res.json();
-  lastVecCalc = { op, payload, data };
-  showVecResult(data);
+  try {
+    const res = await fetch("/api/vectors", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    lastVecCalc = { op, payload, data };
+    showVecResult(data);
+  } catch (err) {
+    showVecResult({ error: "Failed to connect to calculation service." });
+  }
 }
 
 function showVecResult(data) {
@@ -217,13 +230,18 @@ function showVecResult(data) {
   panel.className = "result-panel success";
 
   if (Array.isArray(data.result)) {
-    panel.innerHTML = `<strong>Result Vector:</strong> [ ${data.result.map(v => typeof v === 'number' ? v.toFixed(4).replace(/\.?0+$/, '') : v).join(", ")} ]`;
+    panel.innerHTML = `<div class="d-flex align-items-center gap-2">
+                        <strong class="text-muted">Result Vector:</strong>
+                        <div class="matrix-bracket-wrapper font-monospace fs-5 fw-bold text-primary">
+                          [ ${data.result.map(v => typeof v === 'number' ? v.toFixed(4).replace(/\.?0+$/, '') : v).join(", ")} ]
+                        </div>
+                      </div>`;
   } else if (typeof data.result === 'number') {
     const op = document.getElementById("vecOp").value;
     const unit = op === "angle" ? "°" : "";
-    panel.innerHTML = `<strong>${data.result}${unit}</strong>`;
+    panel.innerHTML = `<div class="fs-3 fw-bold text-primary">${data.result}${unit}</div>`;
   } else {
-    panel.innerHTML = JSON.stringify(data.result);
+    panel.innerHTML = `<div class="fs-4 fw-bold text-primary">${JSON.stringify(data.result)}</div>`;
   }
 
   if (data.steps) {
@@ -298,7 +316,6 @@ function exportVectorPdf() {
 
   downloadPdfFile(`vector_${op}_solution.pdf`, `Vector Solution: ${op}`, text);
 }
-
 
 // Init
 updateVecUI();

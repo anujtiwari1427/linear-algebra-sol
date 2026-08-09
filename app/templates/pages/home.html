@@ -1,68 +1,79 @@
 {% extends "layouts/base.html" %}
-{% block title %}Linear Algebra Solver — Home{% endblock %}
+{% block title %}Linear Algebra Solver — Fast, Simple & Interactive{% endblock %}
 
 {% block content %}
 
 <!-- Hero -->
-<section class="hero">
+<section class="hero px-3">
   <div class="container">
+    <div class="hero-badge">
+      <span>✨</span> Interactive Step-by-Step Solver
+    </div>
     <h1>Linear Algebra Solver</h1>
-    <p>Free online calculators for matrices, vectors, systems of equations, and eigenvalues.</p>
-    <a href="/calculators/matrix/" class="btn btn-primary me-2">Get Started</a>
-    <a href="#tools" class="btn btn-outline-light">See Tools</a>
+    <p>Fast, elegant online calculators for matrices, vectors, linear systems, determinants, eigenvalues, and 2D/3D transformations.</p>
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+      <a href="/calculators/matrix/" class="btn btn-primary btn-lg px-4 fs-6">Get Started Now</a>
+      <a href="#tools" class="btn btn-outline-secondary btn-lg px-4 fs-6 text-white border-secondary">Explore Calculators</a>
+    </div>
   </div>
 </section>
 
-<!-- Tools -->
+<!-- Tools Bento Grid -->
 <section class="container my-5" id="tools">
-  <h2 class="mb-4">Available Calculators</h2>
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h2 class="mb-1">Available Calculators</h2>
+      <p class="text-muted mb-0">Select a tool to compute solutions with detailed steps.</p>
+    </div>
+  </div>
+
   <div class="row g-4">
 
-    <div class="col-sm-6 col-md-4">
+    <div class="col-sm-6 col-lg-4">
       <a href="/calculators/matrix/" class="tool-card">
-        <div class="icon">🔢</div>
-        <h3>Matrix Calculator</h3>
-        <p>Add, subtract, multiply, transpose, inverse, rank, trace.</p>
+        <div class="icon-box">🔢</div>
+        <h3>Matrix Operations</h3>
+        <p>Perform addition, subtraction, multiplication, inverse, transpose, rank, and trace with full breakdown.</p>
       </a>
     </div>
 
-    <div class="col-sm-6 col-md-4">
+    <div class="col-sm-6 col-lg-4">
       <a href="/calculators/determinants/" class="tool-card">
-        <div class="icon">|A|</div>
+        <div class="icon-box">📊</div>
         <h3>Determinants</h3>
-        <p>Step-by-step cofactor expansion, minors &amp; cofactors table.</p>
+        <p>Step-by-step cofactor expansion, minors &amp; cofactors table, and singularity status checks.</p>
       </a>
     </div>
 
-    <div class="col-sm-6 col-md-4">
+    <div class="col-sm-6 col-lg-4">
       <a href="/calculators/vectors/" class="tool-card">
-        <div class="icon">➡️</div>
+        <div class="icon-box">➡️</div>
         <h3>Vector Calculator</h3>
-        <p>Dot product, cross product, magnitude, angle, projection, normalize.</p>
+        <p>Compute dot product, cross product, magnitude, angle, projection, and normalized unit vectors.</p>
       </a>
     </div>
 
-    <div class="col-sm-6 col-md-4">
+    <div class="col-sm-6 col-lg-4">
       <a href="/calculators/systems/" class="tool-card">
-        <div class="icon">🔗</div>
+        <div class="icon-box">🔗</div>
         <h3>Systems of Equations</h3>
-        <p>Solve Ax = b with step-by-step explanation.</p>
+        <p>Solve linear equation systems Ax = b using Gaussian elimination and RREF step explanation.</p>
       </a>
     </div>
 
-    <div class="col-sm-6 col-md-4">
+    <div class="col-sm-6 col-lg-4">
       <a href="/calculators/eigen/" class="tool-card">
-        <div class="icon">λ</div>
-        <h3>Eigenvalues</h3>
-        <p>Compute eigenvalues and eigenvectors of any square matrix.</p>
+        <div class="icon-box">λ</div>
+        <h3>Eigenvalues &amp; Vectors</h3>
+        <p>Calculate characteristic polynomials, eigenvalues, and corresponding eigenvectors of square matrices.</p>
       </a>
     </div>
 
-    <div class="col-sm-6 col-md-4">
+    <div class="col-sm-6 col-lg-4">
       <a href="/calculators/transform/" class="tool-card">
-        <div class="icon">↺</div>
-        <h3>Transformations</h3>
-        <p>Rotation, scaling, shear, reflection, projection — 2D &amp; 3D.</p>
+        <div class="icon-box">↺</div>
+        <h3>Geometric Transform</h3>
+        <p>Apply 2D &amp; 3D rotation, scaling, shear, reflection, and projection transformation matrices.</p>
       </a>
     </div>
 
@@ -72,30 +83,30 @@
 <!-- Quick reference -->
 <section class="container mb-5">
   <div class="section-divider"></div>
-  <h2 class="mb-3">Quick Reference</h2>
-  <div class="row g-3">
+  <h2 class="mb-3">Quick Reference Guide</h2>
+  <div class="row g-4">
     <div class="col-md-6">
-      <div class="card">
+      <div class="card h-100">
         <div class="card-body">
-          <h5 class="card-title">Matrix Operations</h5>
-          <ul class="mb-0">
-            <li><strong>Addition / Subtraction</strong> — same dimensions required</li>
-            <li><strong>Multiplication</strong> — A(m×k) × B(k×n) = C(m×n)</li>
-            <li><strong>Inverse</strong> — exists only if det(A) ≠ 0</li>
-            <li><strong>Transpose</strong> — flip rows and columns</li>
+          <h5 class="card-title fw-bold mb-3 text-primary">Matrix Operations Quick Rules</h5>
+          <ul class="mb-0 text-muted ps-3 leading-relaxed">
+            <li class="mb-2"><strong>Addition / Subtraction</strong> — matrices must share identical dimensions (\(m \times n\)).</li>
+            <li class="mb-2"><strong>Multiplication</strong> — inner dimensions must match: \(A_{m \times k} \times B_{k \times n} = C_{m \times n}\).</li>
+            <li class="mb-2"><strong>Inverse Matrix \(A^{-1}\)</strong> — defined only for square matrices where \(\det(A) \neq 0\).</li>
+            <li class="mb"><strong>Transpose \(A^T\)</strong> — swaps rows into columns such that \((A^T)_{ij} = A_{ji}\).</li>
           </ul>
         </div>
       </div>
     </div>
     <div class="col-md-6">
-      <div class="card">
+      <div class="card h-100">
         <div class="card-body">
-          <h5 class="card-title">Vector Formulas</h5>
-          <ul class="mb-0">
-            <li><strong>Magnitude</strong> — |v| = √(x² + y² + z²)</li>
-            <li><strong>Dot product</strong> — a · b = |a||b|cos(θ)</li>
-            <li><strong>Cross product</strong> — 3D vectors only, result is ⊥ both</li>
-            <li><strong>Projection</strong> — proj_b(a) = (a·b / |b|²) b</li>
+          <h5 class="card-title fw-bold mb-3 text-primary">Vector Formulas Quick Reference</h5>
+          <ul class="mb-0 text-muted ps-3 leading-relaxed">
+            <li class="mb-2"><strong>Magnitude</strong> — \(|\vec{v}| = \sqrt{v_1^2 + v_2^2 + \dots + v_n^2}\)</li>
+            <li class="mb-2"><strong>Dot Product</strong> — \(\vec{a} \cdot \vec{b} = |\vec{a}||\vec{b}|\cos(\theta)\)</li>
+            <li class="mb-2"><strong>Cross Product</strong> — 3D vectors only; yields a vector perpendicular to both.</li>
+            <li class="mb"><strong>Vector Projection</strong> — \(\text{proj}_{\vec{b}}(\vec{a}) = \left(\frac{\vec{a} \cdot \vec{b}}{|\vec{b}|^2}\right)\vec{b}\)</li>
           </ul>
         </div>
       </div>
@@ -103,28 +114,30 @@
   </div>
 </section>
 
-<!-- About -->
+<!-- About Team Section -->
 <section class="container mb-5" id="about">
   <div class="section-divider"></div>
-  <h2 class="mb-1">About</h2>
-  <p class="text-muted mb-4">Meet the team behind this project.</p>
+  <div class="text-center mb-4">
+    <h2 class="mb-1">About the Team</h2>
+    <p class="text-muted">Meet the student contributors behind this project.</p>
+  </div>
   <div class="row g-4 justify-content-center">
 
-    <div class="col-sm-6 col-md-4">
+    <div class="col-sm-6 col-md-5 col-lg-4">
       <div class="about-card">
         <div class="about-avatar">AT</div>
         <h4 class="about-name">Anuj Tiwari</h4>
         <span class="about-roll">Roll No. 36</span>
-        <p class="about-desc">Student &amp; contributor to the Linear Algebra Solver project.</p>
+        <p class="about-desc">Student &amp; core developer of the Linear Algebra Solver project.</p>
       </div>
     </div>
 
-    <div class="col-sm-6 col-md-4">
+    <div class="col-sm-6 col-md-5 col-lg-4">
       <div class="about-card">
         <div class="about-avatar">DP</div>
         <h4 class="about-name">Dharmendra Pal</h4>
         <span class="about-roll">Roll No. 41</span>
-        <p class="about-desc">Student &amp; contributor to the Linear Algebra Solver project.</p>
+        <p class="about-desc">Student &amp; core developer of the Linear Algebra Solver project.</p>
       </div>
     </div>
 
