@@ -1,6 +1,10 @@
 {% extends "layouts/base.html" %}
 {% block title %}Linear Transformations — Linear Algebra Solver{% endblock %}
 
+{% block extra_head %}
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+{% endblock %}
+
 {% block content %}
 
 <div class="calc-header">
@@ -158,66 +162,17 @@
 
       <!-- GEOMETRIC TRANSFORMATION GRAPH VISUALIZER -->
       <div id="tGraphCard" class="card mt-4 shadow-sm" style="display:none; border-radius: var(--radius-md); overflow: hidden;">
-        <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div class="card-header py-3 border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2">
           <div class="d-flex align-items-center gap-2">
-            <span class="fs-5">🎨</span>
-            <h6 class="mb-0 fw-bold">Geometric Transformation Graph</h6>
-            <span id="tGraphBadge" class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill ms-1">2D Graph</span>
+            <span class="fs-5">📈</span>
+            <h6 class="mb-0 fw-bold">Transformation Plot</h6>
+            <span id="tGraphBadge" class="badge rounded-pill ms-1" style="background:var(--primary);color:#0D2B23;">2D</span>
           </div>
-          
-          <div class="d-flex align-items-center gap-2">
-            <!-- View Mode Toggles -->
-            <div class="btn-group btn-group-sm" role="group" aria-label="Graph Layer Toggles">
-              <input type="checkbox" class="btn-check" id="toggleGrid" checked onchange="redrawGraph()">
-              <label class="btn btn-outline-secondary" for="toggleGrid">Grid</label>
-              
-              <input type="checkbox" class="btn-check" id="toggleBasis" checked onchange="redrawGraph()">
-              <label class="btn btn-outline-secondary" for="toggleBasis">Basis Vectors</label>
-              
-              <input type="checkbox" class="btn-check" id="toggleRegion" checked onchange="redrawGraph()">
-              <label class="btn btn-outline-secondary" for="toggleRegion">Unit Area/Cube</label>
-            </div>
-            
-            <!-- Zoom Controls -->
-            <div class="btn-group btn-group-sm ms-1">
-              <button class="btn btn-outline-secondary" onclick="zoomGraph(1.25)" title="Zoom In">🔍+</button>
-              <button class="btn btn-outline-secondary" onclick="zoomGraph(0.8)" title="Zoom Out">🔍−</button>
-              <button class="btn btn-outline-secondary" onclick="resetGraphZoom()" title="Reset View">↺</button>
-            </div>
-          </div>
-        </div>
-        
-        <div class="card-body p-0 position-relative bg-dark text-center">
-          <canvas id="transformCanvas" width="700" height="420" style="width: 100%; max-height: 440px; display: block; cursor: grab; background: #0f172a;"></canvas>
-          <div id="graphHint" class="position-absolute bottom-0 start-0 p-2 small text-white-50" style="font-size:0.75rem; pointer-events:none;">
-            💡 <em>Click & drag to rotate (3D) or pan (2D). Scroll wheel to zoom.</em>
-          </div>
+          <div id="detInfoBadge" class="font-monospace small text-muted fw-semibold">|det(T)| = 1.0</div>
         </div>
 
-        <div class="card-footer bg-light py-2 px-3 small border-top">
-          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <div class="d-flex align-items-center gap-3 flex-wrap">
-              <span class="d-inline-flex align-items-center gap-1">
-                <span style="display:inline-block;width:12px;height:12px;background:#ec4899;border-radius:2px;"></span>
-                <span class="font-monospace">T(î)</span>
-              </span>
-              <span class="d-inline-flex align-items-center gap-1">
-                <span style="display:inline-block;width:12px;height:12px;background:#06b6d4;border-radius:2px;"></span>
-                <span class="font-monospace">T(ĵ)</span>
-              </span>
-              <span id="kHatLegend" class="d-inline-flex align-items-center gap-1" style="display:none">
-                <span style="display:inline-block;width:12px;height:12px;background:#10b981;border-radius:2px;"></span>
-                <span class="font-monospace">T(k̂)</span>
-              </span>
-              <span id="vecLegend" class="d-inline-flex align-items-center gap-1" style="display:none">
-                <span style="display:inline-block;width:12px;height:12px;background:#f59e0b;border-radius:2px;"></span>
-                <span class="font-monospace">T(v)</span>
-              </span>
-            </div>
-            <div id="detInfoBadge" class="font-monospace text-muted fw-semibold">
-              Scaling factor |det(T)| = 1.0
-            </div>
-          </div>
+        <div class="card-body p-2">
+          <div id="transformPlot" style="width:100%; height:420px;"></div>
         </div>
       </div>
 
@@ -517,17 +472,9 @@ function exportTransformPdf() {
 }
 
 /* ==========================================================================
-   GRAPH VISUALIZER ENGINE (2D & 3D Linear Transformations)
+   GRAPH VISUALIZER — Plotly.js Basic Plotting Graph
    ========================================================================== */
 let currentGraphData = null;
-let graphScale = 45; // Pixels per unit
-let graphOffsetX = 0;
-let graphOffsetY = 0;
-let rotX = -25 * Math.PI / 180;
-let rotY = 35 * Math.PI / 180;
-let isDraggingGraph = false;
-let lastMousePos = { x: 0, y: 0 };
-let listenersAttached = false;
 
 function renderTransformGraph(data) {
   currentGraphData = data;
@@ -535,435 +482,224 @@ function renderTransformGraph(data) {
   card.style.display = "block";
 
   const is3D = data.graph_data && data.graph_data.is_3d;
-  document.getElementById("tGraphBadge").textContent = is3D ? "3D Graph" : "2D Graph";
-  document.getElementById("kHatLegend").style.display = is3D ? "inline-flex" : "none";
-
-  const hasVec = (data.input_vector !== undefined);
-  document.getElementById("vecLegend").style.display = hasVec ? "inline-flex" : "none";
+  document.getElementById("tGraphBadge").textContent = is3D ? "3D" : "2D";
 
   const detBadge = document.getElementById("detInfoBadge");
   if (data.graph_data && data.graph_data.determinant !== null) {
     const det = data.graph_data.determinant;
-    detBadge.textContent = `Scaling factor |det(T)| = ${Math.abs(det).toFixed(4)}`;
+    detBadge.textContent = `|det(T)| = ${Math.abs(det).toFixed(4)}`;
   } else {
-    detBadge.textContent = "Linear Transformation Graph";
+    detBadge.textContent = "";
   }
 
-  // Adjust default scale based on 2D vs 3D and max matrix values
-  resetGraphZoom();
-  attachCanvasListeners();
-  redrawGraph();
-}
-
-function zoomGraph(factor) {
-  graphScale *= factor;
-  graphScale = Math.max(10, Math.min(250, graphScale));
-  redrawGraph();
-}
-
-function resetGraphZoom() {
-  const is3D = currentGraphData && currentGraphData.graph_data && currentGraphData.graph_data.is_3d;
-  graphScale = is3D ? 50 : 45;
-  graphOffsetX = 0;
-  graphOffsetY = 0;
-  rotX = -25 * Math.PI / 180;
-  rotY = 35 * Math.PI / 180;
-  redrawGraph();
-}
-
-function attachCanvasListeners() {
-  if (listenersAttached) return;
-  const canvas = document.getElementById("transformCanvas");
-
-  canvas.addEventListener("mousedown", (e) => {
-    isDraggingGraph = true;
-    lastMousePos = { x: e.clientX, y: e.clientY };
-    canvas.style.cursor = "grabbing";
-  });
-
-  window.addEventListener("mousemove", (e) => {
-    if (!isDraggingGraph || !currentGraphData) return;
-    const dx = e.clientX - lastMousePos.x;
-    const dy = e.clientY - lastMousePos.y;
-    lastMousePos = { x: e.clientX, y: e.clientY };
-
-    const is3D = currentGraphData.graph_data && currentGraphData.graph_data.is_3d;
-    if (is3D) {
-      rotY += dx * 0.01;
-      rotX += dy * 0.01;
-    } else {
-      graphOffsetX += dx;
-      graphOffsetY += dy;
-    }
-    redrawGraph();
-  });
-
-  window.addEventListener("mouseup", () => {
-    isDraggingGraph = false;
-    canvas.style.cursor = "grab";
-  });
-
-  canvas.addEventListener("wheel", (e) => {
-    e.preventDefault();
-    const factor = e.deltaY < 0 ? 1.1 : 0.9;
-    zoomGraph(factor);
-  }, { passive: false });
-
-  listenersAttached = true;
-}
-
-function redrawGraph() {
-  if (!currentGraphData || !currentGraphData.graph_data) return;
-  const canvas = document.getElementById("transformCanvas");
-  if (!canvas) return;
-
-  const ctx = canvas.getContext("2d");
-  const dpr = window.devicePixelRatio || 1;
-  const rect = canvas.getBoundingClientRect();
-
-  canvas.width = rect.width * dpr;
-  canvas.height = (rect.height || 380) * dpr;
-
-  ctx.save();
-  ctx.scale(dpr, dpr);
-  const width = rect.width;
-  const height = rect.height || 380;
-
-  // Background
-  ctx.fillStyle = "#0f172a"; // Tech slate dark
-  ctx.fillRect(0, 0, width, height);
-
-  const is3D = currentGraphData.graph_data.is_3d;
   if (is3D) {
-    draw3DGraph(ctx, width, height);
+    render3DPlot(data);
   } else {
-    draw2DGraph(ctx, width, height);
+    render2DPlot(data);
   }
-
-  ctx.restore();
 }
 
-/* ---- 2D GRAPH RENDERER ---- */
-function draw2DGraph(ctx, width, height) {
-  const showGrid = document.getElementById("toggleGrid").checked;
-  const showBasis = document.getElementById("toggleBasis").checked;
-  const showRegion = document.getElementById("toggleRegion").checked;
+/* ---- Helpers ---- */
+function fmtN(v) { return (typeof v === "number") ? +v.toFixed(3) : v; }
+function fmtVec(v) { return `[${v.map(fmtN).join(", ")}]`; }
+function arrow2D(x0, y0, x1, y1, color, name, dash="solid") {
+  return [
+    { x:[x0,x1], y:[y0,y1], mode:"lines", line:{color,width:2.5,dash}, name, showlegend:false },
+    { x:[x1], y:[y1], mode:"markers",
+      marker:{symbol:"arrow", size:14, color, angleref:"previous",
+              line:{color,width:1}},
+      name, showlegend:true,
+      hovertemplate:`<b>${name}</b><extra></extra>` }
+  ];
+}
+function plotlyLayout(isDark) {
+  const bg   = isDark ? "#091e1a" : "#ffffff";
+  const paper = isDark ? "#0f2d27" : "#f8f9fa";
+  const grid = isDark ? "rgba(157,200,141,0.15)" : "rgba(0,0,0,0.1)";
+  const axis = isDark ? "#9DC88D" : "#444";
+  const zero = isDark ? "rgba(157,200,141,0.4)"  : "rgba(0,0,0,0.35)";
+  return {
+    paper_bgcolor: paper,
+    plot_bgcolor:  bg,
+    margin: {l:50,r:30,t:30,b:50},
+    font: {family:"Fira Code, monospace", size:12, color:axis},
+    xaxis: {
+      title:"x", zeroline:true, zerolinecolor:zero, zerolinewidth:2,
+      gridcolor:grid, griddash:"dot", showgrid:true,
+      linecolor:axis, ticks:"outside", tickcolor:axis
+    },
+    yaxis: {
+      title:"y", zeroline:true, zerolinecolor:zero, zerolinewidth:2,
+      gridcolor:grid, griddash:"dot", showgrid:true,
+      linecolor:axis, ticks:"outside", tickcolor:axis,
+      scaleanchor:"x", scaleratio:1
+    },
+    legend: {x:1.01, y:1, bgcolor:"rgba(0,0,0,0)", borderwidth:0},
+    hovermode:"closest"
+  };
+}
+function isDarkMode() {
+  return document.documentElement.getAttribute("data-theme") === "dark";
+}
 
-  const cx = width / 2 + graphOffsetX;
-  const cy = height / 2 + graphOffsetY;
-  const scale = graphScale;
+/* ---- 2D Plotly graph ---- */
+function render2DPlot(data) {
+  const T   = data.transform_matrix;
+  const t2d = (T.length===2 && T[0].length===2) ? T : [[1,0],[0,1]];
+  const gd  = data.graph_data;
+  const traces = [];
 
-  const toScreen = (x, y) => ({
-    x: cx + x * scale,
-    y: cy - y * scale
+  const R = 6; // grid range
+
+  /* Original grid (light dashed) */
+  const origGridX = [], origGridY = [];
+  for (let i=-R; i<=R; i++) {
+    origGridX.push(i,i,null,-R,R,null);
+    origGridY.push(-R,R,null,i,i,null);
+  }
+  traces.push({
+    x:origGridX, y:origGridY, mode:"lines",
+    line:{color: isDarkMode()?"rgba(157,200,141,0.12)":"rgba(0,0,0,0.08)", width:0.8, dash:"dot"},
+    hoverinfo:"none", showlegend:false, name:"orig grid"
   });
 
-  const T = currentGraphData.transform_matrix;
-  const t2d = (T.length === 2 && T[0].length === 2) ? T : [[1,0],[0,1]];
+  /* Transformed grid */
+  const tGridX = [], tGridY = [];
+  for (let i=-R; i<=R; i++) {
+    const v0 = [t2d[0][0]*i+t2d[0][1]*(-R), t2d[1][0]*i+t2d[1][1]*(-R)];
+    const v1 = [t2d[0][0]*i+t2d[0][1]*(R),  t2d[1][0]*i+t2d[1][1]*(R)];
+    tGridX.push(v0[0],v1[0],null);
+    tGridY.push(v0[1],v1[1],null);
 
-  // 1. Original Subtle Grid
-  ctx.lineWidth = 1;
-  ctx.setLineDash([2, 4]);
-  ctx.strokeStyle = "rgba(148, 163, 184, 0.15)";
-  const range = 8;
-  for (let i = -range; i <= range; i++) {
-    let p1 = toScreen(i, -range);
-    let p2 = toScreen(i, range);
-    ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
-
-    p1 = toScreen(-range, i);
-    p2 = toScreen(range, i);
-    ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+    const h0 = [t2d[0][0]*(-R)+t2d[0][1]*i, t2d[1][0]*(-R)+t2d[1][1]*i];
+    const h1 = [t2d[0][0]*(R) +t2d[0][1]*i, t2d[1][0]*(R) +t2d[1][1]*i];
+    tGridX.push(h0[0],h1[0],null);
+    tGridY.push(h0[1],h1[1],null);
   }
-  ctx.setLineDash([]);
+  traces.push({
+    x:tGridX, y:tGridY, mode:"lines",
+    line:{color:"rgba(241,178,74,0.25)", width:1},
+    hoverinfo:"none", showlegend:false, name:"transformed grid"
+  });
 
-  // 2. Transformed Grid Lines
-  if (showGrid) {
-    ctx.strokeStyle = "rgba(99, 102, 241, 0.3)";
-    ctx.lineWidth = 1.2;
-    for (let i = -range; i <= range; i++) {
-      // Vertical line x = i transformed by T
-      const vTop = [t2d[0][0]*i + t2d[0][1]*range, t2d[1][0]*i + t2d[1][1]*range];
-      const vBot = [t2d[0][0]*i - t2d[0][1]*range, t2d[1][0]*i - t2d[1][1]*range];
-      const sTop = toScreen(vTop[0], vTop[1]);
-      const sBot = toScreen(vBot[0], vBot[1]);
-      ctx.beginPath(); ctx.moveTo(sTop.x, sTop.y); ctx.lineTo(sBot.x, sBot.y); ctx.stroke();
-
-      // Horizontal line y = i transformed by T
-      const hRight = [t2d[0][0]*range + t2d[0][1]*i, t2d[1][0]*range + t2d[1][1]*i];
-      const hLeft  = [t2d[0][0]*(-range) + t2d[0][1]*i, t2d[1][0]*(-range) + t2d[1][1]*i];
-      const sRight = toScreen(hRight[0], hRight[1]);
-      const sLeft  = toScreen(hLeft[0], hLeft[1]);
-      ctx.beginPath(); ctx.moveTo(sLeft.x, sLeft.y); ctx.lineTo(sRight.x, sRight.y); ctx.stroke();
-    }
-  }
-
-  // 3. Transformed Unit Square Area (Polygon)
-  if (showRegion && currentGraphData.graph_data.unit_square_trans) {
-    const pts = currentGraphData.graph_data.unit_square_trans.map(pt => toScreen(pt[0], pt[1]));
-    ctx.beginPath();
-    ctx.moveTo(pts[0].x, pts[0].y);
-    for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
-    ctx.closePath();
-
-    ctx.fillStyle = "rgba(79, 70, 229, 0.22)";
-    ctx.fill();
-    ctx.setLineDash([4, 4]);
-    ctx.strokeStyle = "rgba(129, 140, 248, 0.8)";
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-    ctx.setLineDash([]);
-  }
-
-  // 4. Main Axes (X & Y with Axis Ticks and Numeric Labels)
-  ctx.strokeStyle = "rgba(241, 245, 249, 0.4)";
-  ctx.lineWidth = 1.5;
-  let ax1 = toScreen(-range, 0), ax2 = toScreen(range, 0);
-  ctx.beginPath(); ctx.moveTo(ax1.x, ax1.y); ctx.lineTo(ax2.x, ax2.y); ctx.stroke();
-  let ay1 = toScreen(0, -range), ay2 = toScreen(0, range);
-  ctx.beginPath(); ctx.moveTo(ay1.x, ay1.y); ctx.lineTo(ay2.x, ay2.y); ctx.stroke();
-
-  // Axis numeric tick labels
-  ctx.font = "10px 'Fira Code', monospace";
-  ctx.fillStyle = "rgba(203, 213, 225, 0.75)";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "top";
-  const tickStep = (scale < 25) ? 4 : (scale < 50) ? 2 : 1;
-  for (let i = -range; i <= range; i += tickStep) {
-    if (i === 0) continue;
-    // X ticks
-    let px = toScreen(i, 0);
-    ctx.beginPath(); ctx.moveTo(px.x, px.y - 3); ctx.lineTo(px.x, px.y + 3); ctx.stroke();
-    ctx.fillText(i.toString(), px.x, px.y + 5);
-
-    // Y ticks
-    let py = toScreen(0, i);
-    ctx.beginPath(); ctx.moveTo(py.x - 3, py.y); ctx.lineTo(py.x + 3, py.y); ctx.stroke();
-    ctx.save();
-    ctx.textAlign = "right";
-    ctx.textBaseline = "middle";
-    ctx.fillText(i.toString(), py.x - 6, py.y);
-    ctx.restore();
-  }
-
-  // Origin point
-  let p0 = toScreen(0, 0);
-  ctx.fillStyle = "#ffffff";
-  ctx.beginPath(); ctx.arc(p0.x, p0.y, 4, 0, Math.PI * 2); ctx.fill();
-
-  // 5. Basis Vectors T(i_hat) & T(j_hat) with Values
-  if (showBasis && currentGraphData.graph_data.basis_vectors) {
-    const bv = currentGraphData.graph_data.basis_vectors;
-    const ti = toScreen(bv.i_hat_trans[0], bv.i_hat_trans[1]);
-    const tj = toScreen(bv.j_hat_trans[0], bv.j_hat_trans[1]);
-
-    const iLabel = `T(î) = ${formatVecVal(bv.i_hat_trans)}`;
-    const jLabel = `T(ĵ) = ${formatVecVal(bv.j_hat_trans)}`;
-
-    drawArrow(ctx, p0.x, p0.y, ti.x, ti.y, "#ec4899", 3.5, iLabel);
-    drawArrow(ctx, p0.x, p0.y, tj.x, tj.y, "#06b6d4", 3.5, jLabel);
-  }
-
-  // 6. Vector Mapping (Input v & Transformed T(v)) with Values
-  if (currentGraphData.input_vector && currentGraphData.output_vector) {
-    const vIn = currentGraphData.input_vector;
-    const vOut = currentGraphData.output_vector;
-    const sIn = toScreen(vIn[0], vIn[1]);
-    const sOut = toScreen(vOut[0], vOut[1]);
-
-    const vLabel = `v = ${formatVecVal(vIn)}`;
-    const tvLabel = `T(v) = ${formatVecVal(vOut)}`;
-
-    // Original vector v
-    drawArrow(ctx, p0.x, p0.y, sIn.x, sIn.y, "rgba(245, 158, 11, 0.6)", 2, vLabel, [4, 4]);
-    // Transformed vector T(v)
-    drawArrow(ctx, p0.x, p0.y, sOut.x, sOut.y, "#fbbf24", 4, tvLabel);
-  }
-}
-
-/* ---- 3D GRAPH RENDERER ---- */
-function draw3DGraph(ctx, width, height) {
-  const showGrid = document.getElementById("toggleGrid").checked;
-  const showBasis = document.getElementById("toggleBasis").checked;
-  const showRegion = document.getElementById("toggleRegion").checked;
-
-  const cx = width / 2 + graphOffsetX;
-  const cy = height / 2 + graphOffsetY;
-  const scale = graphScale;
-
-  const project3D = (x, y, z) => {
-    const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
-    const x1 = x * cosY + z * sinY;
-    const y1 = y;
-    const z1 = -x * sinY + z * cosY;
-
-    const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
-    const x2 = x1;
-    const y2 = y1 * cosX - z1 * sinX;
-
-    return {
-      x: cx + x2 * scale,
-      y: cy - y2 * scale
-    };
-  };
-
-  const p0 = project3D(0, 0, 0);
-
-  // 1. 3D Coordinate Axes (X-Red, Y-Green, Z-Blue) with Tick Values
-  const range = 4;
-  const pX = project3D(range, 0, 0);
-  const pY = project3D(0, range, 0);
-  const pZ = project3D(0, 0, range);
-
-  ctx.lineWidth = 1.5;
-  ctx.strokeStyle = "rgba(239, 68, 68, 0.5)"; // X axis red
-  ctx.beginPath(); ctx.moveTo(project3D(-range,0,0).x, project3D(-range,0,0).y); ctx.lineTo(pX.x, pX.y); ctx.stroke();
-  
-  ctx.strokeStyle = "rgba(16, 185, 129, 0.5)"; // Y axis green
-  ctx.beginPath(); ctx.moveTo(project3D(0,-range,0).x, project3D(0,-range,0).y); ctx.lineTo(pY.x, pY.y); ctx.stroke();
-  
-  ctx.strokeStyle = "rgba(6, 182, 212, 0.5)"; // Z axis cyan/blue
-  ctx.beginPath(); ctx.moveTo(project3D(0,0,-range).x, project3D(0,0,-range).y); ctx.lineTo(pZ.x, pZ.y); ctx.stroke();
-
-  // Axis labels (X, Y, Z)
-  ctx.font = "bold 11px 'Fira Code', monospace";
-  ctx.fillStyle = "#ef4444"; ctx.fillText("+X", pX.x + 6, pX.y);
-  ctx.fillStyle = "#10b981"; ctx.fillText("+Y", pY.x + 6, pY.y);
-  ctx.fillStyle = "#06b6d4"; ctx.fillText("+Z", pZ.x + 6, pZ.y);
-
-  // 3D Axis tick marks with numbers
-  ctx.font = "9px 'Fira Code', monospace";
-  for (let tick = 2; tick <= range; tick += 2) {
-    let tx = project3D(tick, 0, 0);
-    ctx.fillStyle = "rgba(239, 68, 68, 0.8)"; ctx.fillText(tick.toString(), tx.x, tx.y + 10);
-
-    let ty = project3D(0, tick, 0);
-    ctx.fillStyle = "rgba(16, 185, 129, 0.8)"; ctx.fillText(tick.toString(), ty.x + 8, ty.y);
-
-    let tz = project3D(0, 0, tick);
-    ctx.fillStyle = "rgba(6, 182, 212, 0.8)"; ctx.fillText(tick.toString(), tz.x + 8, tz.y);
-  }
-
-  // 2. Transformed Unit Cube Wireframe
-  if (showRegion && currentGraphData.graph_data.unit_cube_trans) {
-    const pts = currentGraphData.graph_data.unit_cube_trans.map(pt => project3D(pt[0], pt[1], pt[2]));
-    const edges = [
-      [0,1],[1,2],[2,3],[3,0], // Bottom face
-      [4,5],[5,6],[6,7],[7,4], // Top face
-      [0,4],[1,5],[2,6],[3,7]  // Vertical edges
-    ];
-
-    ctx.strokeStyle = "rgba(129, 140, 248, 0.6)";
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([3, 3]);
-    edges.forEach(e => {
-      ctx.beginPath();
-      ctx.moveTo(pts[e[0]].x, pts[e[0]].y);
-      ctx.lineTo(pts[e[1]].x, pts[e[1]].y);
-      ctx.stroke();
+  /* Transformed unit square */
+  if (gd && gd.unit_square_trans) {
+    const sq = gd.unit_square_trans;
+    const sqX = [...sq.map(p=>p[0]), sq[0][0]];
+    const sqY = [...sq.map(p=>p[1]), sq[0][1]];
+    traces.push({
+      x:sqX, y:sqY, mode:"lines",
+      fill:"toself", fillcolor:"rgba(241,178,74,0.15)",
+      line:{color:"#F1B24A", width:1.5, dash:"dash"},
+      name:"T(unit square)", hoverinfo:"none"
     });
-    ctx.setLineDash([]);
   }
 
-  // 3. Transformed Basis Vectors in 3D with Values
-  if (showBasis && currentGraphData.graph_data.basis_vectors) {
-    const bv = currentGraphData.graph_data.basis_vectors;
-    const ti = project3D(bv.i_hat_trans[0], bv.i_hat_trans[1], bv.i_hat_trans[2]);
-    const tj = project3D(bv.j_hat_trans[0], bv.j_hat_trans[1], bv.j_hat_trans[2]);
-    const tk = project3D(bv.k_hat_trans[0], bv.k_hat_trans[1], bv.k_hat_trans[2]);
-
-    const iLabel = `T(î) = ${formatVecVal(bv.i_hat_trans)}`;
-    const jLabel = `T(ĵ) = ${formatVecVal(bv.j_hat_trans)}`;
-    const kLabel = `T(k̂) = ${formatVecVal(bv.k_hat_trans)}`;
-
-    drawArrow(ctx, p0.x, p0.y, ti.x, ti.y, "#ec4899", 3.5, iLabel);
-    drawArrow(ctx, p0.x, p0.y, tj.x, tj.y, "#06b6d4", 3.5, jLabel);
-    drawArrow(ctx, p0.x, p0.y, tk.x, tk.y, "#10b981", 3.5, kLabel);
+  /* Basis vectors */
+  if (gd && gd.basis_vectors) {
+    const bv = gd.basis_vectors;
+    traces.push(...arrow2D(0,0, bv.i_hat_trans[0], bv.i_hat_trans[1],
+      "#e05c9b", `T(î) = ${fmtVec(bv.i_hat_trans)}`));
+    traces.push(...arrow2D(0,0, bv.j_hat_trans[0], bv.j_hat_trans[1],
+      "#22d3ee", `T(ĵ) = ${fmtVec(bv.j_hat_trans)}`));
   }
 
-  // 4. Vector Mapping in 3D with Values
-  if (currentGraphData.input_vector && currentGraphData.output_vector) {
-    const vIn = currentGraphData.input_vector;
-    const vOut = currentGraphData.output_vector;
-    if (vIn.length >= 3 && vOut.length >= 3) {
-      const sIn = project3D(vIn[0], vIn[1], vIn[2]);
-      const sOut = project3D(vOut[0], vOut[1], vOut[2]);
-
-      const vLabel = `v = ${formatVecVal(vIn)}`;
-      const tvLabel = `T(v) = ${formatVecVal(vOut)}`;
-
-      drawArrow(ctx, p0.x, p0.y, sIn.x, sIn.y, "rgba(245, 158, 11, 0.6)", 2, vLabel, [4, 4]);
-      drawArrow(ctx, p0.x, p0.y, sOut.x, sOut.y, "#fbbf24", 4, tvLabel);
-    }
+  /* Input vector and transformed vector */
+  if (data.input_vector && data.output_vector) {
+    const vIn  = data.input_vector.slice(0,2);
+    const vOut = data.output_vector.slice(0,2);
+    traces.push(...arrow2D(0,0, vIn[0],  vIn[1],  "rgba(245,158,11,0.6)",
+      `v = ${fmtVec(vIn)}`, "dash"));
+    traces.push(...arrow2D(0,0, vOut[0], vOut[1], "#F1B24A",
+      `T(v) = ${fmtVec(vOut)}`));
   }
 
-  // Origin point
-  ctx.fillStyle = "#ffffff";
-  ctx.beginPath(); ctx.arc(p0.x, p0.y, 4, 0, Math.PI * 2); ctx.fill();
+  /* Origin dot */
+  traces.push({
+    x:[0], y:[0], mode:"markers",
+    marker:{size:8, color:"#ffffff", line:{color:"#444",width:1}},
+    name:"origin", hovertemplate:"(0, 0)<extra></extra>"
+  });
+
+  const layout = plotlyLayout(isDarkMode());
+  Plotly.react("transformPlot", traces, layout, {responsive:true, displayModeBar:false});
 }
 
-/* Helper to format vector numerical values */
-function formatVecVal(vec) {
-  if (!vec) return "";
-  return `[${vec.map(v => (typeof v === "number" ? +v.toFixed(2) : v)).join(", ")}]`;
-}
+/* ---- 3D Plotly graph ---- */
+function render3DPlot(data) {
+  const T   = data.transform_matrix;
+  const gd  = data.graph_data;
+  const traces = [];
+  const dark = isDarkMode();
+  const bg   = dark ? "#091e1a" : "#ffffff";
+  const paper = dark ? "#0f2d27" : "#f8f9fa";
+  const axisColor = dark ? "#9DC88D" : "#555";
+  const gridColor = dark ? "rgba(157,200,141,0.15)" : "rgba(0,0,0,0.08)";
 
-/* Helper to draw clean vector arrows with pill-backed text label */
-function drawArrow(ctx, x1, y1, x2, y2, color, strokeWidth = 3, label = "", dash = []) {
-  const dx = x2 - x1;
-  const dy = y2 - y1;
-  const len = Math.hypot(dx, dy);
-  if (len < 1) return;
-
-  const headLen = Math.min(14, Math.max(8, len * 0.25));
-  const angle = Math.atan2(dy, dx);
-
-  ctx.save();
-  ctx.strokeStyle = color;
-  ctx.fillStyle = color;
-  ctx.lineWidth = strokeWidth;
-  if (dash.length) ctx.setLineDash(dash);
-
-  // Line
-  ctx.beginPath();
-  ctx.moveTo(x1, y1);
-  ctx.lineTo(x2, y2);
-  ctx.stroke();
-
-  // Arrowhead
-  ctx.setLineDash([]);
-  ctx.beginPath();
-  ctx.moveTo(x2, y2);
-  ctx.lineTo(x2 - headLen * Math.cos(angle - Math.PI / 6), y2 - headLen * Math.sin(angle - Math.PI / 6));
-  ctx.lineTo(x2 - headLen * Math.cos(angle + Math.PI / 6), y2 - headLen * Math.sin(angle + Math.PI / 6));
-  ctx.closePath();
-  ctx.fill();
-
-  // Text label with semi-transparent background pill
-  if (label) {
-    ctx.font = "bold 11px 'Fira Code', monospace";
-    const labelX = x2 + Math.cos(angle) * 14;
-    const labelY = y2 + Math.sin(angle) * 14;
-
-    const metrics = ctx.measureText(label);
-    const textWidth = metrics.width;
-    const textHeight = 14;
-
-    // Draw pill background box
-    ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1;
-    
-    ctx.beginPath();
-    ctx.roundRect(labelX - 4, labelY - textHeight + 2, textWidth + 8, textHeight + 4, 4);
-    ctx.fill();
-    ctx.stroke();
-
-    // Draw label text
-    ctx.fillStyle = "#ffffff";
-    ctx.fillText(label, labelX, labelY);
+  function arrow3D(x0,y0,z0, x1,y1,z1, color, name) {
+    return [
+      { type:"scatter3d", x:[x0,x1],y:[y0,y1],z:[z0,z1],
+        mode:"lines", line:{color,width:4}, name, showlegend:false },
+      { type:"cone", x:[x1],y:[y1],z:[z1],
+        u:[x1-x0],v:[y1-y0],w:[z1-z0],
+        colorscale:[[0,color],[1,color]], showscale:false,
+        sizemode:"absolute", sizeref:0.25,
+        name, showlegend:true,
+        hovertemplate:`<b>${name}</b><extra></extra>` }
+    ];
   }
-  ctx.restore();
+
+  /* Unit cube wireframe */
+  if (gd && gd.unit_cube_trans) {
+    const c = gd.unit_cube_trans;
+    const edges=[[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+    const cx=[],cy=[],cz=[];
+    edges.forEach(e=>{
+      cx.push(c[e[0]][0],c[e[1]][0],null);
+      cy.push(c[e[0]][1],c[e[1]][1],null);
+      cz.push(c[e[0]][2],c[e[1]][2],null);
+    });
+    traces.push({ type:"scatter3d",x:cx,y:cy,z:cz,mode:"lines",
+      line:{color:"rgba(241,178,74,0.5)",width:2,dash:"dot"},
+      name:"T(unit cube)", hoverinfo:"none" });
+  }
+
+  /* Basis vectors */
+  if (gd && gd.basis_vectors) {
+    const bv = gd.basis_vectors;
+    traces.push(...arrow3D(0,0,0, bv.i_hat_trans[0],bv.i_hat_trans[1],bv.i_hat_trans[2],
+      "#e05c9b", `T(î) = ${fmtVec(bv.i_hat_trans)}`));
+    traces.push(...arrow3D(0,0,0, bv.j_hat_trans[0],bv.j_hat_trans[1],bv.j_hat_trans[2],
+      "#22d3ee", `T(ĵ) = ${fmtVec(bv.j_hat_trans)}`));
+    traces.push(...arrow3D(0,0,0, bv.k_hat_trans[0],bv.k_hat_trans[1],bv.k_hat_trans[2],
+      "#4ade80", `T(k̂) = ${fmtVec(bv.k_hat_trans)}`));
+  }
+
+  /* Input / output vectors */
+  if (data.input_vector && data.output_vector && data.input_vector.length >= 3) {
+    const vI=data.input_vector, vO=data.output_vector;
+    traces.push(...arrow3D(0,0,0, vI[0],vI[1],vI[2], "rgba(245,158,11,0.5)", `v = ${fmtVec(vI)}`));
+    traces.push(...arrow3D(0,0,0, vO[0],vO[1],vO[2], "#F1B24A", `T(v) = ${fmtVec(vO)}`));
+  }
+
+  /* Origin */
+  traces.push({ type:"scatter3d", x:[0],y:[0],z:[0], mode:"markers",
+    marker:{size:5,color:"#ffffff"}, name:"O", hovertemplate:"(0,0,0)<extra></extra>" });
+
+  const layout = {
+    paper_bgcolor: paper,
+    scene: {
+      bgcolor: bg,
+      xaxis:{title:"x", gridcolor:gridColor, zerolinecolor:axisColor, tickfont:{color:axisColor}},
+      yaxis:{title:"y", gridcolor:gridColor, zerolinecolor:axisColor, tickfont:{color:axisColor}},
+      zaxis:{title:"z", gridcolor:gridColor, zerolinecolor:axisColor, tickfont:{color:axisColor}},
+      camera:{eye:{x:1.4,y:1.4,z:1.0}}
+    },
+    margin:{l:0,r:0,t:30,b:0},
+    font:{family:"Fira Code, monospace", color:axisColor},
+    legend:{x:1, y:1}
+  };
+  Plotly.react("transformPlot", traces, layout, {responsive:true, displayModeBar:false});
 }
 
 // Init
