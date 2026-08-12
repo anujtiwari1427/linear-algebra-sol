@@ -13,9 +13,13 @@ def solve_transform(transform_type, params, vector=None):
         matrix_list = [[round(float(v), 6) for v in row] for row in T.tolist()]
         steps = _describe_detailed(transform_type, params, T, vector)
 
+        # Compute graph visualization metadata
+        graph_data = _build_graph_data(T)
+
         result = {
             "transform_matrix": matrix_list,
-            "steps": steps
+            "steps": steps,
+            "graph_data": graph_data
         }
 
         if vector is not None:
@@ -147,3 +151,80 @@ def _format_matrix(M):
         formatted_row = "  ".join(f"{v:8.4g}" for v in row)
         lines.append(f"  [ {formatted_row} ]")
     return "\n".join(lines)
+
+
+def _build_graph_data(T):
+    rows, cols = T.shape
+    is_3d = (rows == 3 and cols == 3)
+    is_2d = (rows == 2 and cols == 2)
+
+    det = None
+    if rows == cols:
+        try:
+            det = round(float(np.linalg.det(T)), 6)
+        except Exception:
+            det = None
+
+    data = {
+        "rows": rows,
+        "cols": cols,
+        "is_2d": is_2d,
+        "is_3d": is_3d,
+        "determinant": det
+    }
+
+    if is_2d:
+        # Basis vectors: i = [1, 0], j = [0, 1]
+        i_hat_orig = [1.0, 0.0]
+        j_hat_orig = [0.0, 1.0]
+        i_hat_trans = [round(float(x), 6) for x in T[:, 0].tolist()]
+        j_hat_trans = [round(float(x), 6) for x in T[:, 1].tolist()]
+
+        # Unit square original & transformed
+        unit_sq_orig = [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]]
+        unit_sq_trans = []
+        for pt in unit_sq_orig:
+            v_pt = T @ np.array(pt)
+            unit_sq_trans.append([round(float(x), 6) for x in v_pt.tolist()])
+
+        data["basis_vectors"] = {
+            "i_hat_orig": i_hat_orig,
+            "j_hat_orig": j_hat_orig,
+            "i_hat_trans": i_hat_trans,
+            "j_hat_trans": j_hat_trans
+        }
+        data["unit_square_orig"] = unit_sq_orig
+        data["unit_square_trans"] = unit_sq_trans
+
+    elif is_3d:
+        # Basis vectors: i = [1, 0, 0], j = [0, 1, 0], k = [0, 0, 1]
+        i_hat_orig = [1.0, 0.0, 0.0]
+        j_hat_orig = [0.0, 1.0, 0.0]
+        k_hat_orig = [0.0, 0.0, 1.0]
+        i_hat_trans = [round(float(x), 6) for x in T[:, 0].tolist()]
+        j_hat_trans = [round(float(x), 6) for x in T[:, 1].tolist()]
+        k_hat_trans = [round(float(x), 6) for x in T[:, 2].tolist()]
+
+        # Unit cube vertices
+        cube_orig = [
+            [0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [1.0, 1.0, 0.0], [0.0, 1.0, 0.0],
+            [0.0, 0.0, 1.0], [1.0, 0.0, 1.0], [1.0, 1.0, 1.0], [0.0, 1.0, 1.0]
+        ]
+        cube_trans = []
+        for pt in cube_orig:
+            v_pt = T @ np.array(pt)
+            cube_trans.append([round(float(x), 6) for x in v_pt.tolist()])
+
+        data["basis_vectors"] = {
+            "i_hat_orig": i_hat_orig,
+            "j_hat_orig": j_hat_orig,
+            "k_hat_orig": k_hat_orig,
+            "i_hat_trans": i_hat_trans,
+            "j_hat_trans": j_hat_trans,
+            "k_hat_trans": k_hat_trans
+        }
+        data["unit_cube_orig"] = cube_orig
+        data["unit_cube_trans"] = cube_trans
+
+    return data
+
