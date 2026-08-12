@@ -164,9 +164,14 @@
   border-bottom-color: rgba(157, 200, 141, 0.08);
 }
 
+[data-theme="dark"] .calc-header h1 { color: #ffffff !important; }
+
 [data-theme="dark"] .hero {
   background: linear-gradient(135deg, #071e1a 0%, #0b2d28 100%);
 }
+
+[data-theme="dark"] .hero h1 { color: #ffffff !important; }
+
 
 /* ---- Tool cards ---- */
 [data-theme="dark"] .tool-card {

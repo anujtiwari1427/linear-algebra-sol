@@ -92,14 +92,15 @@
   border-bottom-color: rgba(45,91,255,0.2);
 }
 
-[data-theme="blue"] .calc-header h1 { color: #ffffff; }
+[data-theme="blue"] .calc-header h1 { color: #ffffff !important; }
 [data-theme="blue"] .calc-header p  { color: #7aa3ff; }
 
 [data-theme="blue"] .hero {
   background: linear-gradient(135deg, #0f1e4a 0%, #162258 100%);
 }
 
-[data-theme="blue"] .hero p { color: #7aa3ff; }
+[data-theme="blue"] .hero h1 { color: #ffffff !important; }
+[data-theme="blue"] .hero p  { color: #7aa3ff; }
 
 [data-theme="blue"] .hero-badge {
   background: rgba(45,91,255,0.15);
