@@ -15,12 +15,13 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-dark.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-blue.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-white.css') }}">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <!-- Prevent flash of wrong theme -->
   <script>
     (function() {
       var t = localStorage.getItem('theme');
-      if (t === 'dark' || t === 'blue') {
+      if (t === 'dark' || t === 'blue' || t === 'white') {
         document.documentElement.setAttribute('data-theme', t);
       }
     })();
@@ -53,6 +54,7 @@
       <button class="theme-swatch" id="swatchGreen"  onclick="setTheme('green')"  title="Forest Green" style="background:linear-gradient(135deg,#164A41,#F1B24A);"></button>
       <button class="theme-swatch" id="swatchDark"   onclick="setTheme('dark')"   title="Dark Mode"    style="background:linear-gradient(135deg,#091e1a,#9DC88D);"></button>
       <button class="theme-swatch" id="swatchBlue"   onclick="setTheme('blue')"   title="Electric Blue" style="background:linear-gradient(135deg,#0f1e4a,#2D5BFF);"></button>
+      <button class="theme-swatch" id="swatchWhite"  onclick="setTheme('white')"  title="Pure White"    style="background:linear-gradient(135deg,#FFFFFF,#2563EB); border:1px solid #CBD5E1;"></button>
     </div>
   </div>
 </div>

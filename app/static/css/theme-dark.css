@@ -204,13 +204,34 @@
   color: var(--text-muted);
 }
 
-/* ---- Misc ---- */
-[data-theme="dark"] .section-divider {
-  border-color: var(--border-color);
+/* ---- Utility & Readability Overrides ---- */
+[data-theme="dark"] .text-primary {
+  color: #F1B24A !important; /* Bright warm amber for high contrast title readability */
 }
 
 [data-theme="dark"] .text-muted {
-  color: var(--text-muted) !important;
+  color: #a3d993 !important; /* Bright mint green for crystal clear body readability */
+}
+
+[data-theme="dark"] .text-secondary {
+  color: #c8e6c9 !important;
+}
+
+[data-theme="dark"] strong,
+[data-theme="dark"] b {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .card-title {
+  color: #F1B24A !important;
+}
+
+[data-theme="dark"] ul, [data-theme="dark"] ol {
+  color: #e8f5e9;
+}
+
+[data-theme="dark"] .section-divider {
+  border-color: var(--border-color);
 }
 
 [data-theme="dark"] h1,
@@ -230,3 +251,4 @@
   color: #e8f5e9;
   background-color: rgba(255, 255, 255, 0.05);
 }
+

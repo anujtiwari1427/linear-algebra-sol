@@ -90,10 +90,13 @@ function setTheme(theme) {
 
 function _applyThemeUI() {
   const theme = document.documentElement.getAttribute("data-theme") || "green";
-  ["Green","Dark","Blue"].forEach(n => {
+  ["Green","Dark","Blue","White"].forEach(n => {
     const el = document.getElementById("swatch" + n);
     if (el) el.classList.toggle("active", theme === n.toLowerCase());
   });
   const icon = document.getElementById("themeSwitcherIcon");
-  if (icon) icon.textContent = theme==="dark" ? "\ud83c\udf19" : theme==="blue" ? "\ud83d\udc99" : "\ud83c\udf3f";
+  if (icon) {
+    icon.textContent = theme === "dark" ? "🌙" : theme === "blue" ? "💙" : theme === "white" ? "☀️" : "🌿";
+  }
 }
+

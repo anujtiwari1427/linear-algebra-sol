@@ -230,10 +230,27 @@
 }
 [data-theme="blue"] .about-roll { background: var(--primary-light); color: #2D5BFF; }
 
-/* ---- Misc ---- */
+/* ---- Utility & Readability Overrides ---- */
+[data-theme="blue"] .text-primary {
+  color: #2D5BFF !important;
+}
+
+[data-theme="blue"] .text-muted {
+  color: #3a5098 !important;
+}
+
+[data-theme="blue"] strong,
+[data-theme="blue"] b {
+  color: #0a1035 !important;
+}
+
+[data-theme="blue"] .card-title {
+  color: #2D5BFF !important;
+}
+
 [data-theme="blue"] .section-divider { border-color: var(--border-color); }
-[data-theme="blue"] .text-muted { color: var(--text-muted) !important; }
 [data-theme="blue"] h1,[data-theme="blue"] h2,[data-theme="blue"] h3,
 [data-theme="blue"] h4,[data-theme="blue"] h5,[data-theme="blue"] h6 {
   color: var(--text-main);
 }
+

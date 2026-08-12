@@ -584,3 +584,13 @@ main {
   border-top: 1px solid var(--border-color);
   margin: 36px 0;
 }
+
+/* ---- Text Readability & Utility Overrides ---- */
+.text-primary {
+  color: var(--secondary) !important; /* Deep forest green for crisp card heading contrast */
+}
+
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
