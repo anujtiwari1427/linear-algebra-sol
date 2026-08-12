@@ -594,3 +594,27 @@ main {
   color: var(--text-muted) !important;
 }
 
+/* ---- MathJax Equation Styling ---- */
+mjx-container {
+  color: inherit !important;
+  font-size: 105% !important;
+  display: inline-block !important;
+  margin: 0 2px !important;
+  vertical-align: middle !important;
+}
+
+mjx-container[jax="SVG"] {
+  display: inline-block !important;
+}
+
+mjx-container svg {
+  fill: currentColor !important;
+  color: inherit !important;
+}
+
+[data-theme="dark"] mjx-container svg {
+  fill: #e8f5e9 !important;
+  color: #e8f5e9 !important;
+}
+
+
