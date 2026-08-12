@@ -1,0 +1,232 @@
+/* ==========================================================================
+   Dark Mode Theme — Forest Green & Amber
+   Activated via: <html data-theme="dark">
+   ========================================================================== */
+
+[data-theme="dark"] {
+  --primary: #F1B24A;
+  --primary-hover: #e09e32;
+  --primary-light: rgba(241, 178, 74, 0.15);
+  --secondary: #0b2d28;
+  --secondary-muted: #0f3830;
+
+  --bg-main: #091e1a;
+  --bg-card: #0f2d27;
+  --bg-subtle: #132f29;
+
+  --text-main: #e8f5e9;
+  --text-muted: #9DC88D;
+  --text-light: #4D774E;
+
+  --border-color: #1e4a40;
+  --border-hover: #2d6b5e;
+
+  --success: #9DC88D;
+  --success-bg: rgba(77, 119, 78, 0.2);
+  --warning: #F1B24A;
+  --warning-bg: rgba(241, 178, 74, 0.15);
+  --danger: #e05a50;
+  --danger-bg: rgba(192, 57, 43, 0.2);
+  --info: #9DC88D;
+  --info-bg: rgba(77, 119, 78, 0.2);
+
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 16px -2px rgba(0,0,0,0.4), 0 2px 6px -1px rgba(0,0,0,0.2);
+  --shadow-lg: 0 12px 32px -4px rgba(0,0,0,0.5), 0 4px 12px -2px rgba(0,0,0,0.25);
+  --shadow-indigo: 0 8px 20px -4px rgba(241,178,74,0.25);
+
+  --accent: #9DC88D;
+  --accent-dark: #4D774E;
+  --amber: #F1B24A;
+  --amber-hover: #e09e32;
+}
+
+/* ---- Body background ---- */
+[data-theme="dark"] body,
+[data-theme="dark"] body.app-layout {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+}
+
+/* ---- Cards & surfaces ---- */
+[data-theme="dark"] .card {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .card-header {
+  background: rgba(255,255,255,0.03) !important;
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .card-footer {
+  background: rgba(255,255,255,0.03) !important;
+  border-color: var(--border-color);
+}
+
+/* ---- Result panels ---- */
+[data-theme="dark"] .result-panel {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .result-panel.success {
+  background: var(--bg-card);
+  border-color: #4D774E;
+}
+
+[data-theme="dark"] .result-matrix tr td {
+  background: var(--bg-subtle);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+/* ---- Inputs & selects ---- */
+[data-theme="dark"] .matrix-grid input,
+[data-theme="dark"] .vector-input input,
+[data-theme="dark"] .system-table td input,
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+  background: var(--bg-subtle);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .matrix-grid input:focus,
+[data-theme="dark"] .vector-input input:focus,
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+  background: var(--bg-card);
+  border-color: #4D774E;
+  box-shadow: 0 0 0 3px rgba(77, 119, 78, 0.25);
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .matrix-bracket-wrapper {
+  background: var(--bg-subtle);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .matrix-bracket-wrapper::before,
+[data-theme="dark"] .matrix-bracket-wrapper::after {
+  border-color: var(--text-main);
+}
+
+/* ---- Buttons ---- */
+[data-theme="dark"] .btn-outline-secondary {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .btn-outline-secondary:hover {
+  background: var(--bg-subtle);
+  border-color: var(--border-hover);
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .btn-check:checked + .btn-outline-secondary {
+  background: rgba(241, 178, 74, 0.15);
+  border-color: #F1B24A;
+  color: #F1B24A;
+}
+
+/* ---- Tables ---- */
+[data-theme="dark"] .table {
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .table-bordered td,
+[data-theme="dark"] .table-bordered th {
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .table-light,
+[data-theme="dark"] thead.table-light {
+  background: var(--bg-subtle) !important;
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .table-light tr th {
+  background: var(--bg-subtle) !important;
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] tbody tr {
+  background: var(--bg-card);
+  color: var(--text-main);
+}
+
+/* ---- Headers ---- */
+[data-theme="dark"] .calc-header {
+  background: linear-gradient(135deg, #071e1a 0%, #0b2d28 100%);
+  border-bottom-color: rgba(157, 200, 141, 0.08);
+}
+
+[data-theme="dark"] .hero {
+  background: linear-gradient(135deg, #071e1a 0%, #0b2d28 100%);
+}
+
+/* ---- Tool cards ---- */
+[data-theme="dark"] .tool-card {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .tool-card:hover {
+  border-color: var(--border-hover);
+}
+
+[data-theme="dark"] .tool-card .icon-box {
+  background: rgba(157, 200, 141, 0.12);
+  color: #9DC88D;
+}
+
+[data-theme="dark"] .tool-card p {
+  color: var(--text-muted);
+}
+
+/* ---- About cards ---- */
+[data-theme="dark"] .about-card {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+}
+
+/* ---- Graph card ---- */
+[data-theme="dark"] #tGraphCard .card-header {
+  background: var(--bg-card) !important;
+}
+
+[data-theme="dark"] #tGraphCard .card-footer {
+  background: var(--bg-subtle) !important;
+  color: var(--text-muted);
+}
+
+/* ---- Misc ---- */
+[data-theme="dark"] .section-divider {
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .text-muted {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6 {
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .sidebar-wrapper .nav-link {
+  color: #7aad7c;
+}
+
+[data-theme="dark"] .sidebar-wrapper .nav-link:hover {
+  color: #e8f5e9;
+  background-color: rgba(255, 255, 255, 0.05);
+}

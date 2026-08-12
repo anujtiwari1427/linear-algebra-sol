@@ -110,5 +110,32 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem("sidebarState", "open");
     });
   }
+
+  // Initialize theme toggle button state on load
+  _applyThemeUI();
 });
 
+/**
+ * Toggle between light and dark theme.
+ * Persists choice in localStorage. Applied to <html data-theme="dark">.
+ */
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute("data-theme") === "dark";
+  if (isDark) {
+    html.removeAttribute("data-theme");
+    localStorage.setItem("theme", "light");
+  } else {
+    html.setAttribute("data-theme", "dark");
+    localStorage.setItem("theme", "dark");
+  }
+  _applyThemeUI();
+}
+
+function _applyThemeUI() {
+  const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+  const icon = document.getElementById("themeIcon");
+  const label = document.getElementById("themeLabel");
+  if (icon) icon.textContent = isDark ? "☀️" : "🌙";
+  if (label) label.textContent = isDark ? "Light Mode" : "Dark Mode";
+}
