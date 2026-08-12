@@ -100,14 +100,14 @@ body.app-layout {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--primary) 0%, #6366F1 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--amber) 0%, #e09e32 100%);
+  color: #164A41;
   width: 36px;
   height: 36px;
   border-radius: var(--radius-sm);
   font-weight: 800;
   font-size: 1.15rem;
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+  box-shadow: 0 4px 12px rgba(241,178,74,0.4);
 }
 
 .sidebar-wrapper .nav-link {
@@ -128,9 +128,10 @@ body.app-layout {
 
 .sidebar-wrapper .nav-link.active {
   color: #FFFFFF;
-  background: linear-gradient(90deg, rgba(79, 70, 229, 0.85) 0%, rgba(99, 102, 241, 0.7) 100%);
+  background: linear-gradient(90deg, rgba(241, 178, 74, 0.9) 0%, rgba(224, 158, 50, 0.75) 100%);
   font-weight: 600;
-  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
+  box-shadow: 0 4px 14px rgba(241,178,74,0.3);
+  color: #0D2B23;
 }
 
 .sidebar-wrapper .nav-icon {
@@ -162,11 +163,11 @@ main {
 }
 
 .calc-header {
-  background: linear-gradient(135deg, var(--secondary) 0%, #1E293B 100%);
+  background: linear-gradient(135deg, var(--secondary) 0%, #1d5c51 100%);
   color: white;
   padding: 40px 0 32px;
   margin-bottom: 32px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(157, 200, 141, 0.15);
 }
 
 .calc-header h1 {
@@ -176,7 +177,7 @@ main {
 }
 
 .calc-header p {
-  color: #94A3B8;
+  color: #9DC88D;
   margin: 0;
   font-size: 0.975rem;
 }
@@ -203,7 +204,7 @@ main {
 
 /* ---- Hero & Tool Cards ---- */
 .hero {
-  background: linear-gradient(135deg, var(--secondary) 0%, #1E293B 100%);
+  background: linear-gradient(135deg, var(--secondary) 0%, #1d5c51 100%);
   color: white;
   padding: 70px 0;
   text-align: center;
@@ -222,7 +223,7 @@ main {
 
 .hero p {
   font-size: 1.15rem;
-  color: #94A3B8;
+  color: #9DC88D;
   max-width: 620px;
   margin: 0 auto 28px;
 }
@@ -231,9 +232,9 @@ main {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(79, 70, 229, 0.2);
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  color: #A5B4FC;
+  background: rgba(157, 200, 141, 0.18);
+  border: 1px solid rgba(157, 200, 141, 0.4);
+  color: #9DC88D;
   font-size: 0.825rem;
   font-weight: 600;
   padding: 6px 16px;
@@ -362,8 +363,8 @@ main {
 
 .matrix-grid input:focus {
   outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  border-color: var(--accent-dark);
+  box-shadow: 0 0 0 3px rgba(77, 119, 78, 0.2);
   background: white;
 }
 
@@ -390,8 +391,8 @@ main {
 
 .vector-input input:focus {
   outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  border-color: var(--accent-dark);
+  box-shadow: 0 0 0 3px rgba(77, 119, 78, 0.2);
 }
 
 /* System Ax=b Table Inputs */
@@ -418,14 +419,16 @@ main {
   padding: 10px 20px;
   border-radius: var(--radius-md);
   font-weight: 600;
+  color: #0D2B23;
   box-shadow: var(--shadow-indigo);
   transition: var(--transition);
 }
 
 .btn-primary:hover, .btn-primary:focus {
-  background: linear-gradient(135deg, var(--primary-hover) 0%, #3730A3 100%);
+  background: linear-gradient(135deg, var(--primary-hover) 0%, #c98b24 100%);
   transform: translateY(-1px);
-  box-shadow: 0 10px 24px -4px rgba(79, 70, 229, 0.4);
+  box-shadow: 0 10px 24px -4px rgba(241,178,74,0.45);
+  color: #0D2B23;
 }
 
 .btn-outline-secondary {
@@ -508,9 +511,9 @@ main {
 /* Steps Output Box */
 .steps-box {
   background: var(--secondary);
-  color: #E2E8F0;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-left: 4px solid var(--primary);
+  color: #d1e8d4;
+  border: 1px solid rgba(157, 200, 141, 0.18);
+  border-left: 4px solid var(--amber);
   padding: 20px;
   font-family: var(--font-mono);
   font-size: 0.875rem;
@@ -543,15 +546,15 @@ main {
   width: 68px;
   height: 68px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--secondary) 0%, #334155 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--secondary) 0%, #1d5c51 100%);
+  color: #9DC88D;
   font-size: 1.25rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 16px;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+  box-shadow: 0 4px 12px rgba(22, 74, 65, 0.25);
 }
 
 .about-name {
@@ -563,7 +566,7 @@ main {
 .about-roll {
   display: inline-block;
   background: var(--primary-light);
-  color: var(--primary);
+  color: var(--accent-dark);
   font-size: 0.775rem;
   font-weight: 700;
   padding: 3px 12px;
