@@ -1,141 +1,99 @@
 /**
- * Helper function to trigger a plain text (.txt) file download in the browser.
- * @param {string} filename - The name of the file to save (e.g. 'matrix_solution.txt')
- * @param {string} textContent - The plain text string content to download
+ * Download plain text file.
  */
 function downloadTxtFile(filename, textContent) {
   const blob = new Blob([textContent], { type: "text/plain;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  link.href = url; link.download = filename;
+  document.body.appendChild(link); link.click();
+  document.body.removeChild(link); URL.revokeObjectURL(url);
 }
 
 /**
- * Helper function to trigger a PDF file download in the browser using jsPDF.
- * @param {string} filename - The name of the file to save (e.g. 'matrix_solution.pdf')
- * @param {string} title - Title header inside the PDF document
- * @param {string} textContent - The step-by-step solution text content
+ * Download PDF file using jsPDF.
  */
 function downloadPdfFile(filename, title, textContent) {
   try {
     if (window.jspdf && window.jspdf.jsPDF) {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-      
-      // Header Bar
-      doc.setFillColor(33, 37, 41);
-      doc.rect(0, 0, 210, 22, "F");
-      
-      doc.setTextColor(255, 255, 255);
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(13);
+      doc.setFillColor(33, 37, 41); doc.rect(0, 0, 210, 22, "F");
+      doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(13);
       doc.text(title || "Linear Algebra Detailed Solution", 14, 14);
-      
-      doc.setTextColor(33, 37, 41);
-      doc.setFont("courier", "normal");
-      doc.setFontSize(9.5);
-      
+      doc.setTextColor(33, 37, 41); doc.setFont("courier", "normal"); doc.setFontSize(9.5);
       const lines = doc.splitTextToSize(textContent, 180);
-      let y = 30;
-      const lineHeight = 4.8;
-      const pageHeight = doc.internal.pageSize.height;
-      
+      let y = 30; const lh = 4.8; const ph = doc.internal.pageSize.height;
       for (let i = 0; i < lines.length; i++) {
-        if (y + lineHeight > pageHeight - 15) {
-          doc.addPage();
-          y = 20;
-        }
-        doc.text(lines[i], 14, y);
-        y += lineHeight;
+        if (y + lh > ph - 15) { doc.addPage(); y = 20; }
+        doc.text(lines[i], 14, y); y += lh;
       }
-      
-      const pageCount = doc.internal.getNumberOfPages();
-      doc.setFont("helvetica", "italic");
-      doc.setFontSize(8);
-      doc.setTextColor(120, 120, 120);
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.text(`Linear Algebra Solver — Page ${i} of ${pageCount}`, 14, pageHeight - 8);
-      }
-      
-      doc.save(filename.endsWith(".pdf") ? filename : `${filename}.pdf`);
-    } else {
-      window.print();
-    }
-  } catch (err) {
+      const pc = doc.internal.getNumberOfPages();
+      doc.setFont("helvetica","italic"); doc.setFontSize(8); doc.setTextColor(120,120,120);
+      for (let i=1;i<=pc;i++){doc.setPage(i);doc.text(`Linear Algebra Solver \u2014 Page ${i} of ${pc}`,14,ph-8);}
+      doc.save(filename.endsWith(".pdf") ? filename : filename + ".pdf");
+    } else { window.print(); }
+  } catch(err) {
     console.error("PDF export error:", err);
     alert("Could not generate PDF. Printing page instead.");
     window.print();
   }
 }
 
-
-// Highlight active sidebar navigation item & handle open/close toggle
+/* ============================================================
+   Sidebar & App Initialisation
+   ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
-  const currentPath = window.location.pathname;
-  const navLinks = document.querySelectorAll(".sidebar-wrapper .nav-link");
-
-  navLinks.forEach((link) => {
+  // Active nav link
+  const path = window.location.pathname;
+  document.querySelectorAll(".sidebar-wrapper .nav-link").forEach(link => {
     const href = link.getAttribute("href");
-    if (href === currentPath || (href !== "/" && currentPath.startsWith(href))) {
-      link.classList.add("active");
-    }
+    if (href === path || (href !== "/" && path.startsWith(href))) link.classList.add("active");
   });
 
-  // Restore sidebar collapse state
-  const sidebarState = localStorage.getItem("sidebarState");
-  if (sidebarState === "collapsed") {
-    document.body.classList.add("sidebar-collapsed");
-  }
+  // Restore sidebar state
+  if (localStorage.getItem("sidebarState") === "collapsed") document.body.classList.add("sidebar-collapsed");
 
-  // Sidebar toggle handlers
   const closeBtn = document.getElementById("sidebarCloseBtn");
-  const openBtn = document.getElementById("sidebarOpenBtn");
+  const openBtn  = document.getElementById("sidebarOpenBtn");
+  if (closeBtn) closeBtn.addEventListener("click", () => { document.body.classList.add("sidebar-collapsed"); localStorage.setItem("sidebarState","collapsed"); });
+  if (openBtn)  openBtn.addEventListener("click",  () => { document.body.classList.remove("sidebar-collapsed"); localStorage.setItem("sidebarState","open"); });
 
-  if (closeBtn) {
-    closeBtn.addEventListener("click", () => {
-      document.body.classList.add("sidebar-collapsed");
-      localStorage.setItem("sidebarState", "collapsed");
-    });
-  }
-
-  if (openBtn) {
-    openBtn.addEventListener("click", () => {
-      document.body.classList.remove("sidebar-collapsed");
-      localStorage.setItem("sidebarState", "open");
-    });
-  }
-
-  // Initialize theme toggle button state on load
+  // Init theme
   _applyThemeUI();
+
+  // Close theme panel on outside click
+  document.addEventListener("click", e => {
+    const panel = document.getElementById("themeSwitcherPanel");
+    const sw    = document.getElementById("themeSwitcher");
+    if (panel && sw && !sw.contains(e.target)) panel.classList.remove("open");
+  });
 });
 
-/**
- * Toggle between light and dark theme.
- * Persists choice in localStorage. Applied to <html data-theme="dark">.
- */
-function toggleTheme() {
+/* ============================================================
+   3-Theme Switcher  (green | dark | blue)
+   ============================================================ */
+function openThemeSwitcher() {
+  const p = document.getElementById("themeSwitcherPanel");
+  if (p) p.classList.toggle("open");
+}
+
+function setTheme(theme) {
   const html = document.documentElement;
-  const isDark = html.getAttribute("data-theme") === "dark";
-  if (isDark) {
-    html.removeAttribute("data-theme");
-    localStorage.setItem("theme", "light");
-  } else {
-    html.setAttribute("data-theme", "dark");
-    localStorage.setItem("theme", "dark");
-  }
+  if (theme === "green") { html.removeAttribute("data-theme"); }
+  else { html.setAttribute("data-theme", theme); }
+  localStorage.setItem("theme", theme);
   _applyThemeUI();
+  const p = document.getElementById("themeSwitcherPanel");
+  if (p) p.classList.remove("open");
 }
 
 function _applyThemeUI() {
-  const isDark = document.documentElement.getAttribute("data-theme") === "dark";
-  const icon = document.getElementById("themeIcon");
-  const label = document.getElementById("themeLabel");
-  if (icon) icon.textContent = isDark ? "☀️" : "🌙";
-  if (label) label.textContent = isDark ? "Light Mode" : "Dark Mode";
+  const theme = document.documentElement.getAttribute("data-theme") || "green";
+  ["Green","Dark","Blue"].forEach(n => {
+    const el = document.getElementById("swatch" + n);
+    if (el) el.classList.toggle("active", theme === n.toLowerCase());
+  });
+  const icon = document.getElementById("themeSwitcherIcon");
+  if (icon) icon.textContent = theme==="dark" ? "\ud83c\udf19" : theme==="blue" ? "\ud83d\udc99" : "\ud83c\udf3f";
 }

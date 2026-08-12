@@ -14,12 +14,15 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-dark.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-blue.css') }}">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <!-- Prevent flash of wrong theme -->
   <script>
     (function() {
       var t = localStorage.getItem('theme');
-      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+      if (t === 'dark' || t === 'blue') {
+        document.documentElement.setAttribute('data-theme', t);
+      }
     })();
   </script>
   {% block extra_head %}{% endblock %}
@@ -39,8 +42,113 @@
   {% include 'components/footer.html' %}
 </div>
 
+<!-- Floating Theme Switcher -->
+<div id="themeSwitcher" title="Switch Theme">
+  <button id="themeSwitcherBtn" onclick="openThemeSwitcher()" aria-label="Change theme">
+    <span id="themeSwitcherIcon">🎨</span>
+  </button>
+  <div id="themeSwitcherPanel">
+    <span class="theme-switcher-label">Choose Theme</span>
+    <div class="theme-swatch-row">
+      <button class="theme-swatch" id="swatchGreen"  onclick="setTheme('green')"  title="Forest Green" style="background:linear-gradient(135deg,#164A41,#F1B24A);"></button>
+      <button class="theme-swatch" id="swatchDark"   onclick="setTheme('dark')"   title="Dark Mode"    style="background:linear-gradient(135deg,#091e1a,#9DC88D);"></button>
+      <button class="theme-swatch" id="swatchBlue"   onclick="setTheme('blue')"   title="Electric Blue" style="background:linear-gradient(135deg,#0f1e4a,#2D5BFF);"></button>
+    </div>
+  </div>
+</div>
+
+<style>
+/* ---- Floating Theme Switcher ---- */
+#themeSwitcher {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+#themeSwitcherBtn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: var(--secondary, #164A41);
+  color: white;
+  font-size: 1.3rem;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#themeSwitcherBtn:hover {
+  transform: scale(1.12);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.3);
+}
+
+#themeSwitcherPanel {
+  display: none;
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border-color, #C8DDD1);
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  min-width: 160px;
+  animation: slideUpFade 0.18s ease;
+}
+
+#themeSwitcherPanel.open { display: block; }
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.theme-switcher-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted, #4D774E);
+  margin-bottom: 10px;
+}
+
+.theme-swatch-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.theme-swatch {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.theme-swatch:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+}
+
+.theme-swatch.active {
+  border-color: white;
+  box-shadow: 0 0 0 2px var(--primary, #F1B24A), 0 2px 8px rgba(0,0,0,0.2);
+  transform: scale(1.1);
+}
+</style>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 {% block extra_scripts %}{% endblock %}
 </body>
-</html>
+</html>
